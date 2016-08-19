@@ -8,4 +8,4 @@ This is the public repository for work on the Web Archiving Systems API (WASAPI)
 
 ## How to connect
 * Join or send a message to the [WASAPI-community Google Group](https://groups.google.com/forum/#!forum/wasapi-community).
-* Join the [WASAPI Slack](https://wasapi.slack.com/).
+* Join the [WASAPI Slack](https://docs.google.com/forms/d/e/1FAIpQLScsdTqssLrM9FinmpP8Mow2Hl8zJnfJZfjWxaeXddlvu2VjBw/viewform).
