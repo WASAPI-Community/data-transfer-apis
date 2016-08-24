@@ -8,7 +8,7 @@ This is the public repository for work on the Web Archiving Systems API (WASAPI)
 ## Presentations
 * 2016-08-03: "[WASAPI: Web Archiving Systems Application Programming Interfaces](https://docs.google.com/presentation/d/1XajUcvETUTL_mSsr0vCno-fzSB15MsRsRmP_pikvGO8/edit?usp=sharing)" at [SAA Web Archiving Roundtable](http://www2.archivists.org/groups/web-archiving-roundtable)
 * 2016-06-14: "[WASAPI Web Archive Data Transfer APIs](http://www.slideshare.net/nullhandle/wasapi-web-archive-data-transfer-apis)" at [Archives Unleashed 2.0](http://archivesunleashed.com/)
-* 2016-05-26: "[Systems Interoperability and Collaborative Development for Web Archiving - Filling Gaps in the IMLS National Digital Platform] (http://digital.library.unt.edu/ark:/67531/metadc848591/) at [Texas Conference on Digital Libraries](https://conferences.tdl.org/tcdl/index.php/TCDL/TCDL2016)
+* 2016-05-26: "[Systems Interoperability and Collaborative Development for Web Archiving - Filling Gaps in the IMLS National Digital Platform](http://digital.library.unt.edu/ark:/67531/metadc848591/)" at [Texas Conference on Digital Libraries](https://conferences.tdl.org/tcdl/index.php/TCDL/TCDL2016)
 * 2016-04-12: "[Building API-Based Web Archiving Systems and Services](https://docs.google.com/presentation/d/1IJ9IcLG2cO118oNX0Z5rakiDVySuB9TBWwnVvHTEOAg/edit?usp=sharing)" at the [International Internet Preservation Consortium General Assembly](http://www.netpreserve.org/general-assembly/2016/overview)
 * 2016-04-05: "[Building National Web Archiving Capacity](https://drive.google.com/file/d/0BwW5mtdXJ3huLUowUnRZb0E0Z0E/view?usp=sharing)" at the [CNI Spring 2016 Meeting](https://www.cni.org/events/membership-meetings/past-meetings/spring-2016)
 
