@@ -1,0 +1,210 @@
+swagger: '2.0'
+info:
+  title: WASAPI Export API
+  description: >
+    WASAPI Export API.  A draft of the minimum that a Web Archiving Systems API
+    server must implement.
+  version: 0.1.0
+  contact:
+    name: Jefferson Bailey and Mark Sullivan
+    url: https://github.com/WASAPI-Community/data-transfer-apis
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+consumes:
+  - application/json
+produces:
+  - application/json
+basePath: /v0
+schemes:
+  - https
+paths:
+  /webdata:
+    get:
+      parameters:
+        - name: filename
+          in: query
+          type: string
+          description: >
+            A semicolon-separated list of globs.  In each glob, a star `*`
+            matches any string of characters, and a question mark `?` matches
+            exactly one character.  Are the globs matched against the full
+            pathname (ie with directories) vs just the basename?, and if
+            pathname, is the slash `/` specially matched (cf `**`)?
+        - name: content-type
+          in: query
+          type: string
+          description: A semicolon-separated list of acceptable MIME-types
+      responses:
+        '200':
+          description: Success
+          schema:
+            type: object
+            properties:
+              includes-extra:
+                type: boolean
+              files:
+                $ref: '#/definitions/WebdataMenu'
+        '400':
+          description: The request could not be interpreted
+        '401':
+          description: The Request was unauthorized
+  /jobs:
+    get:
+      summary: Show the jobs on this server accessible to the client
+      responses:
+        '200':
+          description: The list of jobs
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Job'
+    post:
+      parameters:
+        - name: query
+          in: query
+          description: URL-encoded query as appropriate for /webdata end-point
+          type: string
+        - name: function
+          in: query
+          description: >
+            An implementation-specific identifier for some function the
+            implementation supports
+          type: string
+        - name: parameters
+          in: query
+          description: >
+            Other parameters specific to the function and implementation
+            (URL-encoded).  For example: level of compression, priority, time
+            limit, space limit.
+          type: string
+      responses:
+        '201':
+          description: >
+            Job was successfully submitted.  Body is the submitted job.
+          schema:
+            $ref: '#/definitions/Job'
+        '400':
+          description: The request could not be interpreted
+        '401':
+          description: The Request was unauthorized
+  '/jobs/{jobToken}':
+    get:
+      summary: Retrieve status for job
+      parameters:
+        - name: jobToken
+          in: path
+          description: The job token returned from previous request
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Success
+          schema:
+            $ref: '#/definitions/Job'
+        '400':
+          description: The request could not be interpreted
+        '401':
+          description: The Request was unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: No such job
+        '410':
+          description: >
+            Gone / invalidated.  Body may include non-result information about
+            the job.
+definitions:
+  WebdataFile:
+    description: >
+      The unit of distribution of web archival data.  Examples: a WARC file,
+      an ARC file, a CDX file, a WAT file, a DAT file, a tarball.
+    type: object
+    required:
+      - filename
+      - checksum
+      - content-type
+      - locations
+    properties:
+      filename:
+        type: string
+        description: The name of the webdata file
+      content-type:
+        # TODO:  handle compression etc
+        type: string
+        description: >
+          The MIME-type for the webdata file, eg `application/warc`,
+          `application/pdf`
+      checksum:
+        type: string
+        description: >
+          Checksum for the webdata file, eg "sha1:beefface09781234897",
+          "md5:dad0dada09823098"
+      size:
+        type: integer
+        format: int64
+        description: The size in bytes of the webdata file
+      locations:
+        type: array
+        items:
+          type: string
+          format: url
+        description: >
+          A list of (mirrored) sources from which to retrieve (identical copies
+          of) the webdata file, eg "http://archive.org/...",
+          "/ipfs/Qmee6d6b05c21d1ba2f2020fe2db7db34e"
+  WebdataBundle:
+    description: >
+      A "bundle" of webdata files that together satisfy a query, job, etc
+    type: array
+    items:
+      $ref: '#/definitions/WebdataFile'
+  WebdataMenu:
+    description: >
+      A set of alternative webdata bundles, each of which satisfies a given
+      query, job, etc.  An implementation may offer a different bundle (with
+      differing number of webdata files) for each of its available transports,
+      etc.
+    type: array
+    items:
+      $ref: '#/definitions/WebdataBundle'
+  Job:
+    type: object
+    description: A submitted job with optional results
+    required:
+      - jobtoken
+      - function
+      - query
+      - submit-time
+      - state
+    properties:
+      jobtoken:
+        type: string
+        description: >
+          Identifier unique across the implementation.  The implementation
+          chooses the format.  For example: GUID, increasing integer.
+      function:
+        type: string  # enum
+        description: eg `build-WAT`, `build-index`
+      query:
+        type: string
+        description: >
+          The specification of what webdata to include in the job.  Encoding is
+          URL-style, eg `param=value&otherparam=othervalue`.
+      submit-time:
+        type: string
+        format: date-time
+        description: Time of submission, formatted according to RFC3339
+      state:
+        type: string  # enum
+        description: >
+          Implementation-defined, eg `queued`, `running`, `failed`, `complete`,
+          `gone`
+      result:
+        allOf:
+        - description: >
+            This property indicates whether the job has completed (without
+            having been cleaned away).  When present, it is a list of URLs to
+            webdata files.  Should its absense be expressed as omission vs
+            null/undef/etc vs empty list?, and how do we write that in swagger?
+        - $ref: '#/definitions/WebdataMenu'
