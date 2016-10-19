@@ -6,8 +6,8 @@
 
 **General Usage**
 
-   This is a **_generalized_** specification representing only a **_minimum_** set of requirements for development of APIs to facilitate the transfer of archived web data between custodians, systems, repositories, end users, and others. This API focuses on the transfer of WARC and WARC-derived web data and aims to standardize vocabularies and features to inform those institutions, services, and developers building reference implementations local to their organizations. The basic purpose of this API is to return a results list of WARC files and derivative files originating from WARCs and corresponding essential metadata related to location/transfers in response to a user-defined query that includes implementation-specific parameters. The specification includes the notion of a "job" i.e. the ability to submit a job, receive a job token, and track a job status for the creation of derivative web data files that need to be generated locally and will be available via the API upon job completion. This allows the API to meet the intended goals of supporting both WARC file transfer for preservation replication as well as the ability to allow for derivative datasets to be delivered to researchers and users. 
-   
+   This is a **_generalized_** specification representing only a **_minimum_** set of requirements for development of APIs to facilitate the transfer of archived web data between custodians, systems, repositories, end users, and others. This API focuses on the transfer of WARC and WARC-derived web data and aims to standardize vocabularies and features to inform those institutions, services, and developers building reference implementations local to their organizations. The basic purpose of this API is to return a results list of WARC files and derivative files originating from WARCs and corresponding essential metadata related to location/transfers in response to a user-defined query that includes implementation-specific parameters. The specification includes the notion of a "job" i.e. the ability to submit a job, receive a job token, and track a job status for the creation of derivative web data files that need to be generated locally and will be available via the API upon job completion. This allows the API to meet the intended goals of supporting both WARC file transfer for preservation replication as well as the ability to allow for derivative datasets to be delivered to researchers and users.
+
 **Assumptions & Exclusions**
 
 * Implementation APIs built using this specification should be RESTful.
@@ -29,7 +29,7 @@
 **Paths & Examples**
 
   * **/webdata**
-  
+
    *(example: https://<i></i>partner.archive-it.org/v0/export/api/webdata)*
 
 The most basic query using the **/webdata** path returns a list of all web data files on the server which are available to the client, basic metadata about those files, and their download information. Parameters to modify **/webdata** will be determined by institutions building their own implementations. Potential parameters can be as simple as */webdata?directoryName=[name]* or can support an extensive list of parameters to modify a request. Examples of possible parameters could include those defining identifiers for things like account, collection, seed, crawl job, harvest event, session, date range, archival identifier, administrative unit, repository, bucket, and more. All institution-specific query filters and modifiers should be parameters to the **/webdata** path.
@@ -134,12 +134,12 @@ Results here depend on whether jobs have been submitted. If no jobs have been su
 
 POST *https://<i></i>partner.archive-it.org/v0/export/api/jobs*
 
-The POST method includes a string matching a **/webdata** query string plus an implementation-specific function available to the client. In this specification, POST requests remain a bit of an abstraction, as they are dependent upon the implementation-specific parameters supported under **/webdata**. 
+The POST method includes a string matching a **/webdata** query string plus an implementation-specific function available to the client. In this specification, POST requests remain a bit of an abstraction, as they are dependent upon the implementation-specific parameters supported under **/webdata**.
 
 Using the previous **/webdata** example, the below POST request would return a job token for creating WATs for WARC files matching that **/webdata** query:
 
  *https://<i></i>partner.archive-it.org/v0/export/api/jobs?acccountId=123&collectionId=456&startDate=2014&endDate=2015&function=build-wat*
- 
+
 ```
 {
     "jobtoken": "21EC2020-08002B30309D",
@@ -200,7 +200,6 @@ Here’s an example of a single WebdataMenu which contains two WebdataBundles.  
 
 ```
 [
-
  [  ‘http://partner.archive-it.org/.../2016-08-30-blah.warc.gz’,
     ‘http://partner.archive-it.org/.../2016-08-30-blah1.warc.gz’,
     ‘http://partner.archive-it.org/.../2016-08-30-blah2.warc.gz’
