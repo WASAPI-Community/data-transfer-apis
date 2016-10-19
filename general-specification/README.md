@@ -2,7 +2,7 @@
 
 **Introduction**
 
-   This document serves to outline v0.1 of the Web Archive Data Export API developed as part of the Web Archiving Systems API (WASAPI) project of the [Institute of Museum and Library Services](https://www.imls.gov/)-funded [National Leadership Grant, LG-71-15-0174](https://www.imls.gov/grants/available/national-leadership-grants-libraries), "[Systems Interoperability and Collaborative Development for Web Archiving](https://www.imls.gov/sites/default/files/proposal_narritive_lg-71-15-0174_internet_archive.pdf)" (PDF). Primary development of this API specification as well as the creation of multiple reference implementations is being led by Internet Archive (Archive-It) and Stanford University Libraries (DLSS and LOCKSS). Other project partners are University of North Texas, Rutgers University, a Technical Working Group, and an Advisory Board. More information on the WASAPI project can be found at the [WASAPI-Community Github workspace](https://github.com/WASAPI-Community) the [WASAPI-community Google Group](https://groups.google.com/forum/#!forum/wasapi-community), and on the [WASAPI Slack](https://docs.google.com/forms/d/e/1FAIpQLScsdTqssLrM9FinmpP8Mow2Hl8zJnfJZfjWxaeXddlvu2VjBw/viewform) channel.
+   This document serves to outline v0.1 of the Web Archive Data Export API developed as part of the Web Archiving Systems API (WASAPI) project of the [Institute of Museum and Library Services](https://www.imls.gov/)-funded [National Leadership Grant, LG-71-15-0174](https://www.imls.gov/grants/available/national-leadership-grants-libraries), "[Systems Interoperability and Collaborative Development for Web Archiving](https://www.imls.gov/sites/default/files/proposal_narritive_lg-71-15-0174_internet_archive.pdf)" (PDF). Primary development of this API specification as well as the creation of multiple reference implementations is being led by Internet Archive (Archive-It) and Stanford University Libraries (DLSS and LOCKSS). Other project partners are University of North Texas, Rutgers University, a Technical Working Group, and an Advisory Board. More information on the WASAPI project can be found at the [WASAPI-Community GitHub workspace](https://github.com/WASAPI-Community) the [WASAPI-community Google Group](https://groups.google.com/forum/#!forum/wasapi-community), and on the [WASAPI Slack](https://docs.google.com/forms/d/e/1FAIpQLScsdTqssLrM9FinmpP8Mow2Hl8zJnfJZfjWxaeXddlvu2VjBw/viewform) channel.
 
 **General Usage**
 
@@ -15,7 +15,7 @@
 * Implementation APIs must support GET and POST.
 * This specification does not cover authentication and access control, which are considered to be institution and implementation specific.
 * This specification abstracts away institution-specific details in many areas to remain generalizable and minimal. Additional paths, methods, and functions can be added in implementations as desired.
-* The specification allows for both the return of results considered "complete" and “includes extra.” This allow requestors to know if the returned results fully meet the original query or whether addition data is contained in the file list returned. Details are below.
+* The specification allows for both the return of results considered "complete" and “includes extra.” This allow requesters to know if the returned results fully meet the original query or whether addition data is contained in the file list returned. Details are below.
 
 **Issues for General Discussion**
 
@@ -30,13 +30,13 @@
 
   * **/webdata**
 
-   *(example: https://<i></i>partner.archive-it.org/v0/export/api/webdata)*
+   *(example: https://partner.archive-it.org/v0/export/api/webdata)*
 
 The most basic query using the **/webdata** path returns a list of all web data files on the server which are available to the client, basic metadata about those files, and their download information. Parameters to modify **/webdata** will be determined by institutions building their own implementations. Potential parameters can be as simple as */webdata?directoryName=[name]* or can support an extensive list of parameters to modify a request. Examples of possible parameters could include those defining identifiers for things like account, collection, seed, crawl job, harvest event, session, date range, archival identifier, administrative unit, repository, bucket, and more. All institution-specific query filters and modifiers should be parameters to the **/webdata** path.
 
    * **Example queries and results**
 
-*https://<i></i>partner.archive-it.org/v0/export/api/webdata?filename=2016-08-30-blah.warc.gz*
+*https://partner.archive-it.org/v0/export/api/webdata?filename=2016-08-30-blah.warc.gz*
 
 The above query would return a list of a single WARC file (though it may be available via multiple transports).
 
@@ -58,7 +58,7 @@ The above query would return a list of a single WARC file (though it may be avai
 }
 ```
 
-*https://<i></i>partner.archive-it.org/v0/export/api/webdata?acccountId=123&collectionId=456&startDate=01012014&endDate=12312015*
+*https://partner.archive-it.org/v0/export/api/webdata?acccountId=123&collectionId=456&startDate=01012014&endDate=12312015*
 
 The above query would return a list of all the WARCs (with metadata and download links) from between January 1, 2014 and December 31, 2015 for Account 123, Collection 456.
 
@@ -90,13 +90,13 @@ The above query would return a list of all the WARCs (with metadata and download
 
   * **/jobs**
 
-   *(example: https://<i></i>partner.archive-it.org/v0/export/api/jobs)*
+   *(example: https://partner.archive-it.org/v0/export/api/jobs)*
 
 The **/jobs** path shows the jobs on this server accessible to the client. This enables the request and deliver of WARC derivative webdata files. The **/jobs** path supports GET and POST methods. Implementations that do not include the ability to submit a job should still support his path and simply return that no jobs are possible for the client on this server.
 
    * **Example queries and results**
 
-GET  *https://<i></i>partner.archive-it.org/v0/export/api/jobs*
+GET  *https://partner.archive-it.org/v0/export/api/jobs*
 
 Results here depend on whether jobs have been submitted. If no jobs have been submitted, you get an empty list. If you have submitted jobs, you get something similar to the below.
 
@@ -132,13 +132,13 @@ Results here depend on whether jobs have been submitted. If no jobs have been su
 ]
 ```
 
-POST *https://<i></i>partner.archive-it.org/v0/export/api/jobs*
+POST *https://partner.archive-it.org/v0/export/api/jobs*
 
 The POST method includes a string matching a **/webdata** query string plus an implementation-specific function available to the client. In this specification, POST requests remain a bit of an abstraction, as they are dependent upon the implementation-specific parameters supported under **/webdata**.
 
 Using the previous **/webdata** example, the below POST request would return a job token for creating WATs for WARC files matching that **/webdata** query:
 
- *https://<i></i>partner.archive-it.org/v0/export/api/jobs?acccountId=123&collectionId=456&startDate=2014&endDate=2015&function=build-wat*
+ *https://partner.archive-it.org/v0/export/api/jobs?acccountId=123&collectionId=456&startDate=2014&endDate=2015&function=build-wat*
 
 ```
 {
@@ -152,13 +152,13 @@ Using the previous **/webdata** example, the below POST request would return a j
 
   * **/jobs/{jobToken}**
 
-   *(example: https://<i></i>partner.archive-it.org/v0/export/api/jobs/123456)*
+   *(example: https://partner.archive-it.org/v0/export/api/jobs/123456)*
 
 The **/jobs/{jobToken}** path returns the status of a submitted job.
 
    * **Example queries and results**
 
-GET *https://<i></i>partner.archive-it.org/v0/export/api/jobs/21EC2020-08002B30309D*
+GET *https://partner.archive-it.org/v0/export/api/jobs/21EC2020-08002B30309D*
 
 Retrieve status for a submitted job, some metadata, including the original query, time it was requested, etc. Includes results list if job is finished. Results are not necessarily available indefinitely. May return "410 Gone" if derivatives generated by this job have been replaced (e.g. by the results of a newer job), or if job has been expired by some other policy. An implementation may (but is not required to) make results later available under /webdata queries.
 
