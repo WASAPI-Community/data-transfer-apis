@@ -3,6 +3,7 @@
 This is the public repository for work on the Web Archiving Systems API (WASAPI) data transfer APIs. The intention for these APIs is to provide a standardized mechanism for export and import of web archive data (and perhaps, ultimately, derivative data and capture metadata) between diverse systems for preservation, replication, research use, data delivery, and other purposes. Design and development is being carried out by project partners on the [Institute of Museum and Library Services](https://www.imls.gov/)-funded [National Leadership Grant, LG-71-15-0174](https://www.imls.gov/grants/available/national-leadership-grants-libraries), "[Systems Interoperability and Collaborative Development for Web Archiving](https://www.imls.gov/sites/default/files/proposal_narritive_lg-71-15-0174_internet_archive.pdf)" (PDF) in consultation with a technical working group and based on feedback from the web archiving community.
 
 ## Documents
+* 2016-11-29: "[Archive-It 2016 State of the WARC Report](https://archive-it.org/blog/post/2016-state-of-the-warc-our-second-annual-digital-preservation-survey-results/)"
 * 2016-08-19: "[WASAPI Survey on Data Transfer APIs](https://drive.google.com/file/d/0B7toWei7Sy_SOUJlZFhySHZYTWM/view?usp=sharing)"
 
 ## Presentations
