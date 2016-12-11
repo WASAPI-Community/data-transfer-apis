@@ -3,7 +3,7 @@
 
 ## Introduction
 
-This document serves to specify Archive-It's implementation of v1.0.0 of the
+This document serves to specify Archive-It's implementation of v1.0 of the
 Web Archive Data Export API.  It also proposes and assumes changes to the
 minimum specification.
 
