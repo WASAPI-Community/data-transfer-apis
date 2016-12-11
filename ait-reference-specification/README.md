@@ -1,4 +1,4 @@
-# **WASAPI Data Transfer API Archive-It Specification v1.0.0**
+# **WASAPI Data Transfer API Archive-It Specification v1.0**
 
 
 ## Introduction
