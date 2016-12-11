@@ -1,0 +1,433 @@
+swagger: '2.0'
+info:
+  title: Draft WASAPI Export API by Archive-It
+  description: >
+    WASAPI Export API.  What Archive-It will implement.
+  version: 1.0.0
+  contact:
+    name: Jefferson Bailey and Mark Sullivan
+    url: https://github.com/WASAPI-Community/data-transfer-apis
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+consumes:
+  - application/json
+produces:
+  - application/json
+basePath: /v1
+schemes:
+  - https
+paths:
+  /webdata:
+    get:
+      summary: Get the archive files I need
+      description: >
+        Produces a page of the list of the files accessible to the client
+        matching all of the parameters.  A parameter with multiple options
+        matches when any option matches; a missing parameter implicitly
+        matches.
+      parameters:
+        # pagination
+        - $ref: '#/parameters/page'
+        # basic query
+        - $ref: '#/parameters/filename'
+        - $ref: '#/parameters/filetype'
+        # specific to Archive-It
+        - $ref: '#/parameters/crawl-start-after'
+        - $ref: '#/parameters/crawl-start-before'
+        - $ref: '#/parameters/collection'
+        - $ref: '#/parameters/crawl'
+      responses:
+        '200':
+          description: Success
+          schema:
+            $ref: '#/definitions/FileSet'
+        '400':
+          description: The request could not be interpreted
+        '401':
+          description: The request was unauthorized
+  /jobs:
+    get:
+      summary: What jobs do I have?
+      description:
+        Show the jobs on this server accessible to the client
+      parameters:
+        - $ref: '#/parameters/page'
+      responses:
+        '200':
+          description: >
+            Success.  Produces a page of the list of the jobs accessible to
+            the client.
+          schema:
+            type: object
+            required:
+              - jobs
+            properties:
+              count:
+                type: integer
+                description: >
+                  The total number of jobs matching the query (across all pages)
+              previous:
+                description: >
+                  Link (if any) to the previous page of jobs; otherwise null
+                type: [string, "null"]
+                format: url
+              next:
+                description: >
+                  Link (if any) to the next page of jobs; otherwise null
+                type: [string, "null"]
+                format: url
+              jobs:
+                type: array
+                items:
+                  $ref: '#/definitions/Job'
+    post:
+      summary: Make a new job
+      description:
+        Create a job to perform some task
+      parameters:
+        - name: query
+          in: query
+          required: true
+          description: >
+            URL-encoded query as appropriate for /webdata end-point.  The empty
+            query (which matches everything) must explicitly be given as the
+            empty string.
+          type: string
+        - $ref: '#/parameters/function'
+        - name: parameters
+          in: query
+          required: false
+          description: >
+            Other parameters specific to the function and implementation
+            (URL-encoded).  For example: level of compression, priority, time
+            limit, space limit.  Archive-It does not yet accept any such
+            parameters.
+          type: string
+      responses:
+        '201':
+          description: >
+            Job was successfully submitted.  Body is the submitted job.
+          schema:
+            $ref: '#/definitions/Job'
+        '400':
+          description: The request could not be interpreted
+        '401':
+          description: The request was unauthorized
+  '/jobs/{jobtoken}':
+    get:
+      summary: How is my job doing?
+      description:
+        Retrieve information about a job, both the parameters of its submission
+        and its current state.  If the job is complete, the client can get the
+        result through a separate request to `jobs/{jobtoken}/result`.
+      parameters:
+        - $ref: '#/parameters/jobtoken'
+      responses:
+        '200':
+          description: Success
+          schema:
+            $ref: '#/definitions/Job'
+        '400':
+          description: The request could not be interpreted
+        '401':
+          description: The request was unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: No such job
+        '410':
+          description: >
+            Gone / invalidated.  Body may include non-result information about
+            the job.
+  '/jobs/{jobtoken}/result':
+    get:
+      summary: What is the result of my job?
+      description: >
+        For a complete job, produces a page of the resulting files.
+      parameters:
+        - $ref: '#/parameters/page'
+        - $ref: '#/parameters/jobtoken'
+      responses:
+        '200':
+          description: Success
+          schema:
+            $ref: '#/definitions/FileSet'
+        '301':
+          description: The job is in a failed state; get details elsewhere
+        '307':
+          description: >
+            The job failed and will never be fixed; get details elsewhere
+        '400':
+          description: The request could not be interpreted
+        '401':
+          description: The request was unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: No such job or it is not complete
+        '410':
+          description: Job is gone / invalidated
+  '/jobs/{jobtoken}/error':
+    get:
+      summary: Why did my job fail?
+      description: >
+        Give details about a failed job
+      parameters:
+        - $ref: '#/parameters/jobtoken'
+      responses:
+        '200':
+          description: Success (of reporting the error, not of the job itself)
+        '400':
+          description: The request could not be interpreted
+        '401':
+          description: The request was unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: No such job or it did not fail
+        '410':
+          description: Job is gone / invalidated
+definitions:
+  WebdataFile:
+    description: >
+      Description of a unit of distribution of web archival data.  (This data
+      type does not include the actual archival data.)  Examples: a WARC file,
+      an ARC file, a CDX file, a WAT file, a DAT file, a tarball.
+    type: object
+    required:
+      - filename
+      - checksum
+      - filetype
+      - locations
+    properties:
+      filename:
+        type: string
+        description: The name of the webdata file
+      filetype:
+        # TODO:  handle compression etc
+        type: string
+        description: >
+          The format of the archive file, eg `warc`, `wat`, `cdx`
+      checksum:
+        type: array
+        items:
+          type: string
+          format: algorithm-and-colon-and-hexstring
+        description: >
+          Verification of the content of the file.  Must include at least one
+          of MD5 or SHA1.  Each element is a string composed of an abbreviation
+          of the algorithm's name, a colon (`:`), and a hexadecimal string of
+          the checksum value.  For example:
+          `sha1:6b4f32a3408b1cd7db9372a63a2053c3ef25c731`,
+          `md5:766ba6fd3a257edf35d9f42a8dd42a79`.
+      size:
+        type: integer
+        format: int64
+        description: The size in bytes of the webdata file
+      locations:
+        type: array
+        items:
+          type: string
+          format: url
+        description: >
+          A list of (mirrored) sources from which to retrieve (identical copies
+          of) the webdata file, eg `http://archive.org/...`,
+          `/ipfs/Qmee6d6b05c21d1ba2f2020fe2db7db34e`
+  FileSet:
+    type: object
+    required:
+      - count
+      - files
+    properties:
+      includes-extra:
+        type: boolean
+        description: >
+          When false, the data in the `files` contains nothing extraneous from
+          what is necessary to satisfy the query or job.  When true or absent,
+          the client must be prepared to handle irrelevant data within the
+          referenced `files`.
+      count:
+        type: integer
+        description: The total number of files (across all pages)
+      previous:
+        description: >
+          Link (if any) to the previous page of files; otherwise null
+        type: [string, "null"]
+        format: url
+      next:
+        description: >
+          Link (if any) to the next page of files; otherwise null
+        type: [string, "null"]
+        format: url
+      files:
+        type: array
+        items:
+          $ref: '#/definitions/WebdataFile'
+  Job:
+    type: object
+    description: >
+      A job submitted to perform a task.  Conceptually, a complete job has a
+      `result` FileSet, but we avoid sending that potentially large data with
+      every mention of every job.  If the job is complete, the client can get
+      the result through a separate request to `jobs/{jobtoken}/result`.
+    required:
+      - jobtoken
+      - function
+      - query
+      - submit-time
+      - state
+    properties:
+      jobtoken:
+        type: string
+        description: >
+          Identifier unique across the implementation.  The implementation
+          chooses the format.  For example: GUID, increasing integer.
+      function:
+        $ref: '#/definitions/Function'
+      query:
+        type: string
+        description: >
+          The specification of what webdata to include in the job.  Encoding is
+          URL-style, eg `param=value&otherparam=othervalue`.
+      submit-time:
+        type: string
+        format: date-time
+        description: Time of submission, formatted according to RFC3339
+      termination-time:
+        type: string
+        format: date-time
+        description: >
+          Time of completion or failure, formatted according to RFC3339
+      state:
+        type: string
+        enum:
+          - queued
+          - running
+          - failed
+          - complete
+          - gone
+        # alas, can't use GFM
+        description: >
+          The state of the job through its lifecycle.
+          `queued`:  Job has been submitted and is waiting to run.
+          `running`:  Job is currently running.
+          `failed`:  Job ran but failed.
+          `complete`:  Job ran and successfully completed; result is available.
+          `gone`:  Job ran, but the result is no longer available (eg deleted
+            to save storage).
+  Function:
+    type: string
+    enum:
+      - build-wat
+      - build-wane
+      - build-cdx
+    # This would be the more meaningful place to document the concept of
+    # "function", but the parameter gives the documentation more space and
+    # handles GFM.
+    description: >
+      The function of the job.  See the `function` parameter to the POST that
+      created the job.
+parameters:
+  # I wish OpenAPI offered a way to define and compose sets of parameters.
+  # pagination:
+  page:
+    name: page
+    in: query
+    type: integer
+    required: false
+    description: >
+      One-based index for pagination
+  # job token:
+  jobtoken:
+    name: jobtoken
+    in: path
+    description: The job token returned from previous request
+    required: true
+    type: string
+  # basic query:
+  filename:
+    name: filename
+    in: query
+    type: string
+    required: false
+    description: >
+      A semicolon-separated list of "glob" patterns.  In each pattern, a
+      star `*` matches any string of characters, and a question mark `?`
+      matches exactly one character.  The pattern is matched against the
+      full basename (ie must match the beginning and end of the filename,
+      not the full path of directories).
+  filetype:
+    name: filetype
+    in: query
+    type: string
+    required: false
+    description: >
+      A semicolon-separated list of formats of acceptable archive file, eg
+      `warc`, `wat`, `cdx`
+  # Archive-It's implementation of a function
+  function:
+    name: function
+    in: query
+    required: true
+    description: >
+      One of the following strings which have the following meanings:
+
+      - `build-wat`:  Build a WAT file with metadata from the matched archive
+        files
+
+      - `build-wane`:  Build a WANE file with the named entities from the
+        matched archive files
+
+      - `build-cdx`:  Build a CDX file indexing the matched archive files
+
+    type: string
+    enum:
+      - build-wat
+      - build-wane
+      - build-cdx
+  # crawl date (specific to Archive-It):
+  crawl-start-after:
+    name: crawl-start-after
+    type: string
+    format: date-time
+    in: query
+    required: false
+    description: >
+      Match resources that were crawled at or after the time given according to
+      RFC3339.  A date given with no time of day means midnight.  Coordinated
+      Universal (UTC) is preferrred and assumed if no timezone is included.
+      Because `crawl-start-after` matches equal time stamps while
+      `crawl-start-before` excludes equal time stamps, and because we specify
+      instants rather than durations implicit from our units, we can smoothly
+      scale between days and seconds.  That is, we specify ranges in the manner
+      of the C programming language, eg low ≤ x < high.  For example, matching
+      the month of November, 2016 is specified by `crawl-start-after=2016-11-01
+      & crawl-start-before=2016-12-01` or equivalently by
+      `crawl-start-after=2016-11-01T00:00:00Z &
+      crawl-start-before=2016-11-30T16:00:00-08:00`.
+  crawl-start-before:
+    name: crawl-start-before
+    type: string
+    format: date-time
+    in: query
+    required: false
+    description: >
+      Match resources that were crawled strictly before the time given
+      according to RFC3339.  See more detail at `crawl-start-after`.
+  # collection (specific to Archive-It):
+  collection:
+    name: collection
+    type: integer
+    in: query
+    required: false
+    description: >
+      The numeric ID of the collection
+  # crawl (specific to Archive-It):
+  crawl:
+    name: crawl
+    type: integer
+    in: query
+    required: false
+    description: >
+      The numeric ID of the crawl
