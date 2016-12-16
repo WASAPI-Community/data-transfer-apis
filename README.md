@@ -14,6 +14,7 @@ This is the public repository for work on the Web Archiving Systems API (WASAPI)
 * 2016-04-05: "[Building National Web Archiving Capacity](https://drive.google.com/file/d/0BwW5mtdXJ3huLUowUnRZb0E0Z0E/view?usp=sharing)" at the [CNI Spring 2016 Meeting](https://www.cni.org/events/membership-meetings/past-meetings/spring-2016)
 
 ## Meeting Notes
+* 2016-12-13: [WASAPI Technical Working Group](https://docs.google.com/document/d/1q7m6pgINRAUOFGg3SMhCVD_IstAvYbF8cIJ5puO2HP8/edit)
 * 2016-03-30: [WASAPI Technical Working Group](https://docs.google.com/document/d/1kDbk3J_DVpqj2rBFQmQIoijYjwgWQKgY-19H6rckGkk/edit?ts=57c36d5a)
 
 ## How to connect
