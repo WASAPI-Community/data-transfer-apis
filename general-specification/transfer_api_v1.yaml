@@ -62,17 +62,17 @@ paths:
     post:
       parameters:
         - name: query
-          in: query
+          in: formData
           description: URL-encoded query as appropriate for /webdata end-point
           type: string
         - name: function
-          in: query
+          in: formData
           description: >
             An implementation-specific identifier for some function the
             implementation supports
           type: string
         - name: parameters
-          in: query
+          in: formData
           description: >
             Other parameters specific to the function and implementation
             (URL-encoded).  For example: level of compression, priority, time

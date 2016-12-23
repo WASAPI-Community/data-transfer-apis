@@ -87,7 +87,7 @@ paths:
         Create a job to perform some task
       parameters:
         - name: query
-          in: query
+          in: formData
           required: true
           description: >
             URL-encoded query as appropriate for /webdata end-point.  The empty
@@ -96,7 +96,7 @@ paths:
           type: string
         - $ref: '#/parameters/function'
         - name: parameters
-          in: query
+          in: formData
           required: false
           description: >
             Other parameters specific to the function and implementation
@@ -368,7 +368,7 @@ parameters:
   # Archive-It's implementation of a function
   function:
     name: function
-    in: query
+    in: formData
     required: true
     description: >
       One of the following strings which have the following meanings:
