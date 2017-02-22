@@ -255,13 +255,13 @@ dependent upon the implementation-specific parameters supported under
 Using the previous `/webdata` example, the below POST request would return a
 job token for creating WATs for WARC files matching that `/webdata` query:
 
- `https://partner.archive-it.org/export/v1/jobs?collection=456&crawl-start-after=2014&crawl-start-before=2015&function=build-wat`
+ `https://partner.archive-it.org/export/v1/jobs?collection=456&crawl-start-after=2014-01-01&crawl-start-before=2015-01-01&function=build-wat`
 
 ```
 {
     "jobtoken": "1440",
     "function": "build-wat",
-    "query": "collection=456&crawl-start-after=2014&crawl-start-before=2015",
+    "query": "collection=456&crawl-start-after=2014-01-01&crawl-start-before=2015-01-01",
     "submit-time": "2016-08-30Z15:52:53",
     "state": "queued"
 }
@@ -284,7 +284,7 @@ query, time it was requested, whether it has completed ie current state, etc.
 {
     "jobtoken": "1440",
     "function": "build-wat",
-    "query": "collection=456&crawl-start-after=2014&crawl-start-before=2015",
+    "query": "collection=456&crawl-start-after=2014-01-01&crawl-start-before=2015-01-01",
     "submit-time": "2016-08-30Z15:52:53",
     "termination-time": "2016-08-30Z15:59:13",
     "state": "complete"
