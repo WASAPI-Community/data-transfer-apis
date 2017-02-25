@@ -1,0 +1,193 @@
+swagger: '2.0'
+info:
+  title: WASAPI Export API as implemented by Archive-It
+  description: >
+    WASAPI Export API.  What Archive-It has implemented.
+  version: 1.0.0
+  contact:
+    name: Jefferson Bailey and Mark Sullivan
+    url: https://github.com/WASAPI-Community/data-transfer-apis
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+consumes:
+  - application/json
+produces:
+  - application/json
+basePath: /wasapi/v1
+schemes:
+  - https
+paths:
+  /webdata/:
+    get:
+      summary: Get the archive files I need
+      description: >
+        Produces a page of the list of the files accessible to the client
+        matching all of the parameters.  A parameter with multiple options
+        matches when any option matches; a missing parameter implicitly
+        matches.
+      parameters:
+        # pagination
+        - $ref: '#/parameters/page'
+        # basic query
+        - $ref: '#/parameters/filename'
+        # specific to Archive-It
+        - $ref: '#/parameters/crawl-start-after'
+        - $ref: '#/parameters/crawl-start-before'
+        - $ref: '#/parameters/collection'
+        - $ref: '#/parameters/crawl'
+      responses:
+        '200':
+          description: Success
+          schema:
+            $ref: '#/definitions/FileSet'
+        '400':
+          description: The request could not be interpreted
+definitions:
+  WebdataFile:
+    description: >
+      Description of a unit of distribution of web archival data.  (This data
+      type does not include the actual archival data.)  Examples: a WARC file,
+      an ARC file, a CDX file, a WAT file, a DAT file, a tarball.
+    type: object
+    required:
+      - filename
+      - checksum
+      - filetype
+      - locations
+    properties:
+      filename:
+        type: string
+        description: The name of the webdata file
+      filetype:
+        type: string
+        description: >
+          The format of the archive file, eg `warc`, `wat`, `cdx`
+      checksum:
+        type: array
+        items:
+          type: string
+          format: algorithm-and-colon-and-hexstring
+        description: >
+          Verification of the content of the file.  Must include at least one
+          of MD5 or SHA1.  Each element is a string composed of an abbreviation
+          of the algorithm's name, a colon (`:`), and a hexadecimal string of
+          the checksum value.  For example:
+          `sha1:6b4f32a3408b1cd7db9372a63a2053c3ef25c731`,
+          `md5:766ba6fd3a257edf35d9f42a8dd42a79`.
+      size:
+        type: integer
+        format: int64
+        description: The size in bytes of the webdata file
+      collection:
+        type: integer
+        format: int64
+        description: The numeric ID of the collection
+      crawl:
+        type: integer
+        format: int64
+        description: The numeric ID of the crawl
+      locations:
+        type: array
+        items:
+          type: string
+          format: url
+        description: >
+          A list of (mirrored) sources from which to retrieve (identical copies
+          of) the webdata file, eg `https://partner.archive-it.org/webdatafile/ARCHIVEIT-4567-CRAWL_SELECTED_SEEDS-JOB1000016543-20170107214356419-00005.warc.gz`,
+          `/ipfs/Qmee6d6b05c21d1ba2f2020fe2db7db34e`
+  FileSet:
+    type: object
+    required:
+      - count
+      - results
+    properties:
+      includes-extra:
+        type: boolean
+        description: >
+          When false, the data in the `files` contains nothing extraneous from
+          what is necessary to satisfy the query or job.  When true or absent,
+          the client must be prepared to handle irrelevant data within the
+          referenced `files`.
+      count:
+        type: integer
+        description: The total number of files (across all pages)
+      previous:
+        description: >
+          Link (if any) to the previous page of files; otherwise null
+        type: [string, "null"]
+        format: url
+      next:
+        description: >
+          Link (if any) to the next page of files; otherwise null
+        type: [string, "null"]
+        format: url
+      results:
+        type: array
+        items:
+          $ref: '#/definitions/WebdataFile'
+parameters:
+  # I wish OpenAPI offered a way to define and compose sets of parameters.
+  # pagination:
+  page:
+    name: page
+    in: query
+    type: integer
+    required: false
+    description: >
+      One-based index for pagination
+  # basic query:
+  filename:
+    name: filename
+    in: query
+    type: string
+    required: false
+    description: >
+      A semicolon-separated list of "glob" patterns.  In each pattern, a
+      star `*` matches any string of characters, and a question mark `?`
+      matches exactly one character.  The pattern is matched against the
+      full basename (ie must match the beginning and end of the filename,
+      not the full path of directories).
+  # crawl date (specific to Archive-It):
+  crawl-start-after:
+    name: crawl-start-after
+    type: string
+    format: date-time
+    in: query
+    required: false
+    description: >
+      Match resources that were crawled at or after the time given according to
+      RFC3339.  A date given with no time of day means midnight.  The current
+      implementation does not support any expression of timezones.
+      Because `crawl-start-after` matches equal time stamps while
+      `crawl-start-before` excludes equal time stamps, and because we specify
+      instants rather than durations implicit from our units, we can smoothly
+      scale between days and seconds.  That is, we specify ranges in the manner
+      of the C programming language, eg low ≤ x < high.  For example, matching
+      the month of November, 2016 is specified by `crawl-start-after=2016-11-01
+      & crawl-start-before=2016-12-01`.
+  crawl-start-before:
+    name: crawl-start-before
+    type: string
+    format: date-time
+    in: query
+    required: false
+    description: >
+      Match resources that were crawled strictly before the time given
+      according to RFC3339.  See more detail at `crawl-start-after`.
+  # collection (specific to Archive-It):
+  collection:
+    name: collection
+    type: integer
+    in: query
+    required: false
+    description: >
+      The numeric ID of the collection
+  # crawl (specific to Archive-It):
+  crawl:
+    name: crawl
+    type: integer
+    in: query
+    required: false
+    description: >
+      The numeric ID of the crawl
