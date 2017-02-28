@@ -1,14 +1,11 @@
 # Archive-It WASAPI implementation
 
-The `archiveit/wasapi` app is the bulk of the code by which Archive-It implements the WASAPI specification.  It was written within and then extracted from the [Django project  
-] that serves [ 
-Archive-It's partner site], so --while it can not be run alone-- it can be fit easily into another Django project.
+The `archiveit/wasapi` app is the bulk of the code by which Archive-It implements the WASAPI specification.  It was written within and then extracted from the [Django project](https://www.djangoproject.com/) that serves [Archive-It's partner site](https://partner.archive-it.org/), so --while it can not be run alone-- it can be fit easily into another Django project.
 
 
 ## Formal specifications
 
-The [OpenAPI ] 
-file `wasapi/swagger.yaml` describes Archive-It's ideal specification at the start of implementation (with few adjustments).  The file `wasapi/implemented-swagger.yaml` shows what has been implemented.  The difference between the two serves as a to-do list:  note particularly that jobs are not yet implemented.
+The [OpenAPI](https://www.openapis.org/) file `wasapi/swagger.yaml` describes Archive-It's ideal specification at the start of implementation (with few adjustments).  The file `wasapi/implemented-swagger.yaml` shows what has been implemented.  The difference between the two serves as a to-do list:  note particularly that jobs are not yet implemented.
 
 
 ## Re-integrating the code
