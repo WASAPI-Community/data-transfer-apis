@@ -1,6 +1,6 @@
 # Archive-It WASAPI implementation
 
-The `archiveit/wasapi` app is the bulk of the code by which Archive-It implements the WASAPI specification.  It was written within and then extracted from the [Django project](https://www.djangoproject.com/) that serves [Archive-It's partner site](https://partner.archive-it.org/), so --while it can not be run alone-- it can be fit easily into another Django project.
+The `archiveit/wasapi` application is the bulk of the code by which Archive-It implements the WASAPI specification.  It was written within and then extracted from the [Django](https://www.djangoproject.com/) project (version 1.8.5) that serves [Archive-It's partner site](https://partner.archive-it.org/), so --while it can not be run alone-- it can be fit easily into another Django project.
 
 
 ## Formal specifications
@@ -10,26 +10,26 @@ The [OpenAPI](https://www.openapis.org/) file `wasapi/swagger.yaml` describes Ar
 
 ## Re-integrating the code
 
-To use the `wasapi` app within another Django project, you must resolve some references it has to the Archive-It project.
+To use the `wasapi` application within another Django project, you must resolve some references it has to the Archive-It project.
 
 Archive-It's webdata files are modeled in `archiveit.archiveit.models.WarcFile`; replace that with your own.
 
-The URL paths to the WASAPI endpoints (and also transport of webdata files) were established in `archiveit/urls.py`; add your own reference:
+The URL paths to the WASAPI endpoints (and also transport of webdata files) were established in `archiveit/urls.py`; add your own reference to your own routing file (as appropriate for the version of Django you are using):
 
-  urlpatterns = (
-    # [...]
-    patterns('',
+    urlpatterns = (
       # [...]
-      url(r'^wasapi/v1/', include('archiveit.wasapi.urls')),
-      url(r'^webdatafile/', include('archiveit.webdata.urls')),
+      patterns('',
+        # [...]
+        url(r'^wasapi/v1/', include('archiveit.wasapi.urls')),
+        url(r'^webdatafile/', include('archiveit.webdata.urls')),
+      )
     )
-  )
 
-The full URL to transport a webdata file was defined by WEBDATA_LOCATION_TEMPLATE in `archiveit.settings`.  It uses named parameters from the webdata file model eg `filename`.  Make your own, eg:
+The full URL to transport a webdata file was defined by WEBDATA_LOCATION_TEMPLATE in `archiveit.settings`.  It uses named parameters from the webdata file model, eg `filename`.  Make your own, eg:
 
     WEBDATA_LOCATION_TEMPLATE = BASEURL + '/webdatafile/%%(filename)s'
 
 
-## The `webdata` app
+## The `webdata` application
 
-The `archiveit/webdata` app implements transport of webdata files.  That is outside the scope of the WASAPI specification, but we include it here for completeness.  It transparently serves webdata files from Archive-It's Petabox and HDFS stores.
+The `archiveit/webdata` application implements transport of webdata files.  That is outside the scope of the WASAPI specification, but we include it here for completeness.  It transparently serves webdata files from Archive-It's Petabox and HDFS stores.
