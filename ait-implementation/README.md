@@ -5,7 +5,7 @@ The `archiveit/wasapi` application is the bulk of the code by which Archive-It i
 
 ## Formal specifications
 
-The [OpenAPI](https://www.openapis.org/) file `wasapi/swagger.yaml` describes Archive-It's ideal specification at the start of implementation (with few adjustments).  The file `wasapi/implemented-swagger.yaml` shows what has been implemented.  The difference between the two serves as a to-do list:  note particularly that jobs are not yet implemented.
+The [OpenAPI](https://www.openapis.org/) file `wasapi/swagger.yaml` describes Archive-It's ideal specification at the start of implementation (with few adjustments).  The file `wasapi/implemented-swagger.yaml` shows what has been implemented.  The difference between the two serves as a to-do list:  note that you can submit new jobs and monitor their status but not yet retrieve their results.
 
 
 ## Re-integrating the code
@@ -30,6 +30,10 @@ The full URL to transport a webdata file was defined by WEBDATA_LOCATION_TEMPLAT
     WEBDATA_LOCATION_TEMPLATE = BASEURL + '/webdatafile/%%(filename)s'
 
 
+## The notification mailer and admin interface
+
+To fit with Archive-It's existing work flow, the implementation sends a notification email upon submission of a new job.  We also provide [Django admin site](https://docs.djangoproject.com/en/dev/ref/contrib/admin/) to change the state of jobs.  This is outside the scope of the WASAPI specification, but we include it here for completeness.
+
 ## The `webdata` application
 
-The `archiveit/webdata` application implements transport of webdata files.  That is outside the scope of the WASAPI specification, but we include it here for completeness.  It transparently serves webdata files from Archive-It's Petabox and HDFS stores.
+The `archiveit/webdata` application implements transport of webdata files.  That is well outside the scope of the WASAPI specification, but we include it here also for completeness.  It transparently serves webdata files from Archive-It's Petabox and HDFS stores.
