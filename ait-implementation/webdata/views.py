@@ -62,7 +62,9 @@ def stream_from_pbox(itemname, filename):
 def stream_from_hdfs(hdfs_path, filename):
     # TODO:  consider using python3 snakebite
     # TODO:  handle errors etc; would be nice to examine returncode
-    hdfs_cat = Popen([settings.HDFS_EXE, 'dfs', '-cat', hdfs_path], stdout=PIPE)
+    # (but halfway through a big stream is too late to tell the client, right?)
+    hdfs_cat = Popen([settings.HDFS_EXE, 'dfs', '-cat', hdfs_path],
+      env=settings.HADOOP_ENV, stdout=PIPE)
     return hdfs_cat.stdout
 
 def may_access_collection_id(request, collection_id):

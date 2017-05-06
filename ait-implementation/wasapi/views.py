@@ -1,8 +1,9 @@
 from rest_framework import viewsets
 from rest_framework.response import Response
-from archiveit.wasapi.serializers import WebdataFileSerializer
-from archiveit.wasapi.filters import WasapiAuthFilterBackend, FieldFilterBackend, WasapiMappedFilterBackend
+from archiveit.wasapi.serializers import WebdataFileSerializer, JobSerializer
+from archiveit.wasapi.filters import WasapiAuthFilterBackend, FieldFilterBackend, WebdataMappedFieldFilterBackend
 from archiveit.archiveit.models import WarcFile
+from archiveit.wasapi.models import WasapiJob
 
 
 class WebdataQueryViewSet(viewsets.ModelViewSet):
@@ -15,7 +16,7 @@ class WebdataQueryViewSet(viewsets.ModelViewSet):
     filter_backends = [
       WasapiAuthFilterBackend,
       FieldFilterBackend,
-      WasapiMappedFilterBackend]
+      WebdataMappedFieldFilterBackend]
     paginate_by_param = 'page_size'
     paginate_by = 100
     max_paginate_by = 2000
@@ -33,6 +34,18 @@ class WebdataQueryViewSet(viewsets.ModelViewSet):
         serializer.fields['includes-extra'] = WedgeValueIntoObjectField(
           value=False, label='includes-extra')
         return Response(serializer.data)
+
+
+class JobsViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows WASAPI jobs to be created and monitored.
+    """
+    queryset = WasapiJob.objects.all().order_by('-id')
+    serializer_class = JobSerializer
+    filter_backends = [WasapiAuthFilterBackend]
+    paginate_by_param = 'page_size'
+    paginate_by = 100
+    max_paginate_by = 2000
 
 
 class WedgeValueIntoObjectField(object):

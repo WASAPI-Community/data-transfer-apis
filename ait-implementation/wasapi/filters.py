@@ -38,7 +38,7 @@ class MappedFieldFilterBackend(BaseFilterBackend):
         return queryset
 
 
-class WasapiMappedFilterBackend(MappedFieldFilterBackend):
+class WebdataMappedFieldFilterBackend(MappedFieldFilterBackend):
     """Wasapi-specific queries beyond what DRF provides"""
     filter_for_parameter = {
       'crawl': 'crawl_job_id',

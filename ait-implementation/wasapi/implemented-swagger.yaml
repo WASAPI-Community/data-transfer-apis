@@ -18,7 +18,7 @@ basePath: /wasapi/v1
 schemes:
   - https
 paths:
-  /webdata/:
+  /webdata:
     get:
       summary: Get the archive files I need
       description: >
@@ -43,6 +43,91 @@ paths:
             $ref: '#/definitions/FileSet'
         '400':
           description: The request could not be interpreted
+  /jobs:
+    get:
+      summary: What jobs do I have?
+      description:
+        Show the jobs on this server accessible to the client
+      parameters:
+        - $ref: '#/parameters/page'
+      responses:
+        '200':
+          description: >
+            Success.  Produces a page of the list of the jobs accessible to
+            the client.
+          schema:
+            type: object
+            required:
+              - count
+              - results
+            properties:
+              count:
+                type: integer
+                description: >
+                  The total number of jobs matching the query (across all pages)
+              previous:
+                description: >
+                  Link (if any) to the previous page of jobs; otherwise null
+                type: [string, "null"]
+                format: url
+              next:
+                description: >
+                  Link (if any) to the next page of jobs; otherwise null
+                type: [string, "null"]
+                format: url
+              results:
+                type: array
+                items:
+                  $ref: '#/definitions/Job'
+    post:
+      summary: Make a new job
+      description:
+        Create a job to perform some task
+      parameters:
+        - name: query
+          in: formData
+          required: true
+          description: >
+            URL-encoded query as appropriate for /webdata end-point.  The empty
+            query (which matches everything) must explicitly be given as the
+            empty string.
+          type: string
+        - $ref: '#/parameters/function'
+        - name: parameters
+          in: formData
+          required: false
+          description: >
+            Other parameters specific to the function and implementation
+            (URL-encoded).  For example: level of compression, priority, time
+            limit, space limit.  Archive-It does not yet accept any such
+            parameters.
+          type: string
+      responses:
+        '201':
+          description: >
+            Job was successfully submitted.  Body is the submitted job.
+          schema:
+            $ref: '#/definitions/Job'
+        '400':
+          description: The request could not be interpreted
+  '/jobs/{jobtoken}':
+    get:
+      summary: How is my job doing?
+      description:
+        Retrieve information about a job, both the parameters of its submission
+        and its current state.  If the job is complete, the client can get the
+        result through a separate request to `jobs/{jobtoken}/result`.
+      parameters:
+        - $ref: '#/parameters/jobtoken'
+      responses:
+        '200':
+          description: Success
+          schema:
+            $ref: '#/definitions/Job'
+        '400':
+          description: The request could not be interpreted
+        '404':
+          description: No such job visible to this client
 definitions:
   WebdataFile:
     description: >
@@ -126,6 +211,70 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/WebdataFile'
+  Job:
+    type: object
+    description: >
+      A job submitted to perform a task.  Conceptually, a complete job has a
+      `result` FileSet, but we avoid sending that potentially large data with
+      every mention of every job.  If the job is complete, the client can get
+      the result through a separate request to `jobs/{jobtoken}/result`.
+    required:
+      - jobtoken
+      - function
+      - query
+      - submit_time
+      - state
+    properties:
+      jobtoken:
+        type: string
+        description: >
+          Identifier unique across the implementation.  Archive-It has chosen
+          to use an increasing integer.
+      function:
+        $ref: '#/definitions/Function'
+      query:
+        type: string
+        description: >
+          The specification of what webdata to include in the job.  Encoding is
+          URL-style, eg `param=value&otherparam=othervalue`.
+      submit_time:
+        type: string
+        format: date-time
+        description: Time of submission, formatted according to RFC3339
+      termination_time:
+        type: string
+        format: date-time
+        description: >
+          Time of completion or failure, formatted according to RFC3339
+      state:
+        type: string
+        enum:
+          - queued
+          - running
+          - failed
+          - complete
+          - gone
+        # alas, can't use GFM
+        description: >
+          The state of the job through its lifecycle.
+          `queued`:  Job has been submitted and is waiting to run.
+          `running`:  Job is currently running.
+          `failed`:  Job ran but failed.
+          `complete`:  Job ran and successfully completed; result is available.
+          `gone`:  Job ran, but the result is no longer available (eg deleted
+            to save storage).
+  Function:
+    type: string
+    enum:
+      - build-wat
+      - build-wane
+      - build-cdx
+    # This would be the more meaningful place to document the concept of
+    # "function", but the parameter gives the documentation more space and
+    # handles GFM.
+    description: >
+      The function of the job.  See the `function` parameter to the POST that
+      created the job.
 parameters:
   # I wish OpenAPI offered a way to define and compose sets of parameters.
   # pagination:
@@ -136,6 +285,13 @@ parameters:
     required: false
     description: >
       One-based index for pagination
+  # job token:
+  jobtoken:
+    name: jobtoken
+    in: path
+    description: The job token returned from previous request
+    required: true
+    type: string
   # basic query:
   filename:
     name: filename
@@ -148,6 +304,27 @@ parameters:
       matches exactly one character.  The pattern is matched against the
       full basename (ie must match the beginning and end of the filename,
       not the full path of directories).
+  # Archive-It's implementation of a function
+  function:
+    name: function
+    in: formData
+    required: true
+    description: >
+      One of the following strings which have the following meanings:
+
+      - `build-wat`:  Build a WAT file with metadata from the matched archive
+        files
+
+      - `build-wane`:  Build a WANE file with the named entities from the
+        matched archive files
+
+      - `build-cdx`:  Build a CDX file indexing the matched archive files
+
+    type: string
+    enum:
+      - build-wat
+      - build-wane
+      - build-cdx
   # crawl date (specific to Archive-It):
   crawl-start-after:
     name: crawl-start-after
