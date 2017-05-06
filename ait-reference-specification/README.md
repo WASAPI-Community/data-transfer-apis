@@ -211,9 +211,9 @@ download links) from between January 1, 2014 and December 31, 2015 for Collectio
    *(example: `https://partner.archive-it.org/export/v1/jobs`)*
 
 The `/jobs` path shows the jobs on this server accessible to the client. This
-enables the request and deliver of WARC derivative webdata files. The `/jobs`
+enables the request and delivery of WARC derivative webdata files. The `/jobs`
 path supports GET and POST methods. Implementations that do not include the
-ability to submit a job should still support his path and simply return that no
+ability to submit a job should still support this path and simply return that no
 jobs are possible for the client on this server.
 
    * **Example queries and results**

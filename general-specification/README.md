@@ -92,7 +92,7 @@ The above query would return a list of all the WARCs (with metadata and download
 
    *(example: https://partner.archive-it.org/v0/export/api/jobs)*
 
-The **/jobs** path shows the jobs on this server accessible to the client. This enables the request and deliver of WARC derivative webdata files. The **/jobs** path supports GET and POST methods. Implementations that do not include the ability to submit a job should still support his path and simply return that no jobs are possible for the client on this server.
+The **/jobs** path shows the jobs on this server accessible to the client. This enables the request and delivery of WARC derivative webdata files. The **/jobs** path supports GET and POST methods. Implementations that do not include the ability to submit a job should still support this path and simply return that no jobs are possible for the client on this server.
 
    * **Example queries and results**
 
