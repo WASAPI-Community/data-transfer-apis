@@ -1,6 +1,6 @@
 from rest_framework import viewsets
 from rest_framework.response import Response
-from archiveit.wasapi.serializers import WebdataFileSerializer, JobSerializer
+from archiveit.wasapi.serializers import WebdataFileSerializer, PaginationSerializerOfFiles, JobSerializer, PaginationSerializerOfJobs
 from archiveit.wasapi.filters import WasapiAuthFilterBackend, FieldFilterBackend, WebdataMappedFieldFilterBackend
 from archiveit.archiveit.models import WarcFile
 from archiveit.wasapi.models import WasapiJob
@@ -17,6 +17,7 @@ class WebdataQueryViewSet(viewsets.ModelViewSet):
       WasapiAuthFilterBackend,
       FieldFilterBackend,
       WebdataMappedFieldFilterBackend]
+    pagination_serializer_class = PaginationSerializerOfFiles
     paginate_by_param = 'page_size'
     paginate_by = 100
     max_paginate_by = 2000
@@ -43,6 +44,7 @@ class JobsViewSet(viewsets.ModelViewSet):
     queryset = WasapiJob.objects.all().order_by('-id')
     serializer_class = JobSerializer
     filter_backends = [WasapiAuthFilterBackend]
+    pagination_serializer_class = PaginationSerializerOfJobs
     paginate_by_param = 'page_size'
     paginate_by = 100
     max_paginate_by = 2000

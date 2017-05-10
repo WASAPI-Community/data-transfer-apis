@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from rest_framework import serializers
+from rest_framework.pagination import PaginationSerializer
 from archiveit.archiveit.models import WarcFile
 from archiveit.wasapi.models import WasapiJob
 
@@ -32,11 +33,21 @@ class WebdataFileSerializer(serializers.HyperlinkedModelSerializer):
           'crawl_start',
           'locations')
 
+class PaginationSerializerOfFiles(PaginationSerializer):
+    'Pagination serializer that labels the "results" as "files"'
+    results_field = 'files'
+
+
 class JobSerializer(serializers.HyperlinkedModelSerializer):
 
-    state = serializers.CharField(read_only=True)
-    account = serializers.PrimaryKeyRelatedField(read_only=True)
-    jobtoken = serializers.SerializerMethodField('jobtoken_method')
+    # explicitly adding to locals() lets us include '-' in name of fields
+    locals().update({
+      'state': serializers.CharField(read_only=True),
+      'account': serializers.PrimaryKeyRelatedField(read_only=True),
+      'jobtoken': serializers.SerializerMethodField('jobtoken_method'),
+      'submit-time': serializers.DateTimeField(source='submit_time'),
+      'termination-time': serializers.DateTimeField(source='termination_time')})
+
     def jobtoken_method(self, obj):
         return str(obj.id)
 
@@ -46,8 +57,8 @@ class JobSerializer(serializers.HyperlinkedModelSerializer):
           'jobtoken',
           'function',
           'query',
-          'submit_time',
-          'termination_time',
+          'submit-time',
+          'termination-time',
           'state',
           'account')
 
@@ -71,3 +82,7 @@ class JobSerializer(serializers.HyperlinkedModelSerializer):
             raise PermissionDenied
         value['account'] = account
         return value
+
+class PaginationSerializerOfJobs(PaginationSerializer):
+    'Pagination serializer that labels the "results" as "jobs"'
+    results_field = 'jobs'

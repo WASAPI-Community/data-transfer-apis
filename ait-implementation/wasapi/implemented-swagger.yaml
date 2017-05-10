@@ -59,7 +59,7 @@ paths:
             type: object
             required:
               - count
-              - results
+              - jobs
             properties:
               count:
                 type: integer
@@ -75,7 +75,7 @@ paths:
                   Link (if any) to the next page of jobs; otherwise null
                 type: [string, "null"]
                 format: url
-              results:
+              jobs:
                 type: array
                 items:
                   $ref: '#/definitions/Job'
@@ -185,7 +185,7 @@ definitions:
     type: object
     required:
       - count
-      - results
+      - files
     properties:
       includes-extra:
         type: boolean
@@ -207,7 +207,7 @@ definitions:
           Link (if any) to the next page of files; otherwise null
         type: [string, "null"]
         format: url
-      results:
+      files:
         type: array
         items:
           $ref: '#/definitions/WebdataFile'
@@ -222,7 +222,7 @@ definitions:
       - jobtoken
       - function
       - query
-      - submit_time
+      - submit-time
       - state
     properties:
       jobtoken:
@@ -237,11 +237,11 @@ definitions:
         description: >
           The specification of what webdata to include in the job.  Encoding is
           URL-style, eg `param=value&otherparam=othervalue`.
-      submit_time:
+      submit-time:
         type: string
         format: date-time
         description: Time of submission, formatted according to RFC3339
-      termination_time:
+      termination-time:
         type: string
         format: date-time
         description: >
