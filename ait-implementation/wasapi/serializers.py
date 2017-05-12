@@ -6,13 +6,21 @@ from archiveit.archiveit.models import WarcFile
 from archiveit.wasapi.models import WasapiJob
 
 class WebdataFileSerializer(serializers.HyperlinkedModelSerializer):
-    filetype = serializers.CharField()
-    checksum = serializers.CharField()
-    account = serializers.SerializerMethodField('account_method')
-    collection = serializers.PrimaryKeyRelatedField()
-    crawl = serializers.IntegerField()
-    crawl_start = serializers.SerializerMethodField('crawl_start_method')
-    locations = serializers.SerializerMethodField('locations_method')
+    # explicitly adding to locals() lets us include '-' in name of fields
+    locals().update({
+      'filetype': serializers.SerializerMethodField('filetype_method'),
+      'checksums': serializers.SerializerMethodField('checksums_method'),
+      'account': serializers.SerializerMethodField('account_method'),
+      'collection': serializers.PrimaryKeyRelatedField(),
+      'crawl': serializers.IntegerField(),
+      'crawl-start': serializers.SerializerMethodField('crawl_start_method'),
+      'locations': serializers.SerializerMethodField('locations_method')})
+    def filetype_method(self, obj):
+        return "warc"
+    def checksums_method(self, obj):
+        return {
+          'sha1': obj.sha1,
+          'md5': obj.md5 }
     def account_method(self, obj):
         return obj.account_id
     def crawl_start_method(self, obj):
@@ -25,12 +33,12 @@ class WebdataFileSerializer(serializers.HyperlinkedModelSerializer):
         fields = (
           'filename',
           'filetype',
-          'checksum',
+          'checksums',
           'account',
           'size',
           'collection',
           'crawl',
-          'crawl_start',
+          'crawl-start',
           'locations')
 
 class PaginationSerializerOfFiles(PaginationSerializer):

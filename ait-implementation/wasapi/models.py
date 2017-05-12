@@ -1,8 +1,8 @@
-from __future__ import absolute_import
 from django.core.urlresolvers import reverse
 from django.db import models
-from .mailer import new_wasapijob
 from django.db.models.signals import post_save
+from django.dispatch import receiver
+from archiveit.wasapi.mailer import Mailer
 
 class WasapiJob(models.Model):
 
@@ -52,11 +52,10 @@ class WasapiJob(models.Model):
     def get_absolute_url(self):
         return reverse('wasapijob-detail', kwargs={'pk':self.id})
 
+post_save.connect(Mailer.new_wasapijob, sender=WasapiJob)
 
 # Voodoo to patch bug exposed in restore_object:
 # TypeError: can only concatenate tuple (not "list") to tuple
 # at ait5/ lib/python3.5/site-packages/rest_framework/serializers.py:969
 # for field in meta.many_to_many + meta.virtual_fields:
 WasapiJob._meta.virtual_fields = ()  # was []; many_to_many is ()
-
-post_save.connect(receiver=new_wasapijob, sender=WasapiJob)

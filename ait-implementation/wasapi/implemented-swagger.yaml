@@ -137,7 +137,7 @@ definitions:
     type: object
     required:
       - filename
-      - checksum
+      - checksums
       - filetype
       - locations
     properties:
@@ -148,18 +148,18 @@ definitions:
         type: string
         description: >
           The format of the archive file, eg `warc`, `wat`, `cdx`
-      checksum:
-        type: array
+      checksums:
+        type: object
         items:
           type: string
-          format: algorithm-and-colon-and-hexstring
+          format: hexstring
         description: >
           Verification of the content of the file.  Must include at least one
-          of MD5 or SHA1.  Each element is a string composed of an abbreviation
-          of the algorithm's name, a colon (`:`), and a hexadecimal string of
-          the checksum value.  For example:
-          `sha1:6b4f32a3408b1cd7db9372a63a2053c3ef25c731`,
-          `md5:766ba6fd3a257edf35d9f42a8dd42a79`.
+          of MD5 or SHA1.  The key specifies the lowercase name of the
+          algorithm; the element is a hexadecimal string of the checksum
+          value.  For example:
+          {"sha1":"6b4f32a3408b1cd7db9372a63a2053c3ef25c731",
+          "md5":"766ba6fd3a257edf35d9f42a8dd42a79"}
       size:
         type: integer
         format: int64
@@ -172,6 +172,10 @@ definitions:
         type: integer
         format: int64
         description: The numeric ID of the crawl
+      crawl-start:
+        type: string
+        format: date-time
+        description: Time the crawl started
       locations:
         type: array
         items:
