@@ -57,8 +57,8 @@ redirected to `/jobs/{jobtoken}/error` in the case that the job fails.
 
 Since it is useless to require the presence of checksums without mandating any
 specific checksum, every implementation should provide at least one of MD5 or
-SHA1.  To allow evolution, the specification should use an array instead of a
-single checksum.  To ensure interoperability, all checksums should be
+SHA1.  To allow evolution, the specification should use a dictionary instead of
+a single string.  To ensure interoperability, all checksums should be
 represented as hexadecimal strings.
 
 ### Change label describing format of archive file
