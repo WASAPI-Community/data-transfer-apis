@@ -1,7 +1,7 @@
 from rest_framework import viewsets
 from rest_framework.response import Response
 from archiveit.wasapi.serializers import WebdataFileSerializer, PaginationSerializerOfFiles, JobSerializer, PaginationSerializerOfJobs
-from archiveit.wasapi.filters import WasapiAuthFilterBackend, FieldFilterBackend, WebdataMappedFieldFilterBackend
+from archiveit.wasapi.filters import WasapiAuthFilterBackend, WebdataFieldFilterBackend, WebdataMappedFieldFilterBackend
 from archiveit.archiveit.models import WarcFile
 from archiveit.wasapi.models import WasapiJob
 
@@ -15,7 +15,7 @@ class WebdataQueryViewSet(viewsets.ModelViewSet):
     serializer_class = WebdataFileSerializer
     filter_backends = [
       WasapiAuthFilterBackend,
-      FieldFilterBackend,
+      WebdataFieldFilterBackend,
       WebdataMappedFieldFilterBackend]
     pagination_serializer_class = PaginationSerializerOfFiles
     paginate_by_param = 'page_size'
@@ -34,6 +34,8 @@ class WebdataQueryViewSet(viewsets.ModelViewSet):
         # this as we add other queries.
         serializer.fields['includes-extra'] = WedgeValueIntoObjectField(
           value=False, label='includes-extra')
+        serializer.fields['request-url'] = WedgeValueIntoObjectField(
+          value=request._request.build_absolute_uri(), label='request-url')
         return Response(serializer.data)
 
 

@@ -1,4 +1,3 @@
-from django.db.models import Q
 from rest_framework.filters import BaseFilterBackend
 
 
@@ -14,14 +13,26 @@ class WasapiAuthFilterBackend(BaseFilterBackend):
 
 
 class FieldFilterBackend(BaseFilterBackend):
-    """Simple filtering on equality of fields"""
+    """Simple filtering on equality and inclusion of fields
 
+    Any given field that is included in the class's multi_field_names is tested
+    against any of potentially multiple arguments given in the request.  Any
+    other (existing) field is tested for equality with the given value."""
+
+    multi_field_names = set()
     def filter_queryset(self, request, queryset, view):
         field_names = set( field.name for field in queryset.model._meta.get_fields() )
         for key, value in request.GET.items():
-            if key in field_names:
-                queryset = queryset.filter(Q(**{ key:value }))
+            if key in self.multi_field_names:
+                filter_value = { key+'__in': request.QUERY_PARAMS.getlist(key) }
+                queryset = queryset.filter(**filter_value)
+            elif key in field_names:
+                queryset = queryset.filter(**{ key:value })
         return queryset
+
+
+class WebdataFieldFilterBackend(FieldFilterBackend):
+    multi_field_names = {'collection'}
 
 
 class MappedFieldFilterBackend(BaseFilterBackend):
@@ -42,6 +53,8 @@ class WebdataMappedFieldFilterBackend(MappedFieldFilterBackend):
     """Wasapi-specific queries beyond what DRF provides"""
     filter_for_parameter = {
       'crawl': 'crawl_job_id',
+      'crawl-time-after': 'crawl_time__gte',
+      'crawl-time-before': 'crawl_time__lt',
       'crawl-start-after': 'crawl_job__original_start_date__gte',
       'crawl-start-before': 'crawl_job__original_start_date__lt',
     }

@@ -7,9 +7,11 @@ from django.conf import settings
 from internetarchive import get_session
 
 from archiveit.archiveit.models import WarcFile
+from archiveit.webdata.decorators import logged_in_or_basicauth
 
 VERBOTEN_FILENAMES = re.compile(r'EXTRACTED|EXTRACTION|HISTORICAL')
 
+@logged_in_or_basicauth()
 def index(request, filename):
 
     # check authorization:

@@ -32,6 +32,8 @@ paths:
         # basic query
         - $ref: '#/parameters/filename'
         # specific to Archive-It
+        - $ref: '#/parameters/crawl-time-after'
+        - $ref: '#/parameters/crawl-time-before'
         - $ref: '#/parameters/crawl-start-after'
         - $ref: '#/parameters/crawl-start-before'
         - $ref: '#/parameters/collection'
@@ -172,6 +174,10 @@ definitions:
         type: integer
         format: int64
         description: The numeric ID of the crawl
+      crawl-time:
+        type: string
+        format: date-time
+        description: Time the original content of the file was crawled
       crawl-start:
         type: string
         format: date-time
@@ -303,11 +309,8 @@ parameters:
     type: string
     required: false
     description: >
-      A semicolon-separated list of "glob" patterns.  In each pattern, a
-      star `*` matches any string of characters, and a question mark `?`
-      matches exactly one character.  The pattern is matched against the
-      full basename (ie must match the beginning and end of the filename,
-      not the full path of directories).
+      A string exactly matching the webdata file's basename (ie must match the
+      beginning and end of the filename, not the full path of directories).
   # Archive-It's implementation of a function
   function:
     name: function
@@ -329,7 +332,33 @@ parameters:
       - build-wat
       - build-wane
       - build-cdx
-  # crawl date (specific to Archive-It):
+  # time of crawl (specific to Archive-It):
+  crawl-time-after:
+    name: crawl-time-after
+    type: string
+    format: date-time
+    in: query
+    required: false
+    description: >
+      Match resources that were crawled at or after the time given according to
+      RFC3339.  A date given with no time of day means midnight UTC.  The
+      current implementation does not support any expression of timezones.
+      Because `crawl-time-after` matches equal time stamps while
+      `crawl-time-before` excludes equal time stamps, and because we specify
+      instants rather than durations implicit from our units, we can smoothly
+      scale between days and seconds.  That is, we specify ranges in the manner
+      of the C programming language, eg low ≤ x < high.  For example, matching
+      the month of November of 2016 is specified by
+      `crawl-time-after=2016-11-01 & crawl-time-before=2016-12-01`.
+  crawl-time-before:
+    name: crawl-time-before
+    type: string
+    format: date-time
+    in: query
+    required: false
+    description: >
+      Match resources that were crawled strictly before the time given
+      according to RFC3339.  See more detail at `crawl-time-after`.
   crawl-start-after:
     name: crawl-start-after
     type: string
@@ -337,16 +366,10 @@ parameters:
     in: query
     required: false
     description: >
-      Match resources that were crawled at or after the time given according to
-      RFC3339.  A date given with no time of day means midnight.  The current
-      implementation does not support any expression of timezones.
-      Because `crawl-start-after` matches equal time stamps while
-      `crawl-start-before` excludes equal time stamps, and because we specify
-      instants rather than durations implicit from our units, we can smoothly
-      scale between days and seconds.  That is, we specify ranges in the manner
-      of the C programming language, eg low ≤ x < high.  For example, matching
-      the month of November, 2016 is specified by `crawl-start-after=2016-11-01
-      & crawl-start-before=2016-12-01`.
+      Match resources that were crawled in a job that started at or after the
+      time given according to RFC3339.  (Note that the original content of a
+      file could be crawled many days after the crawl job started; would you
+      prefer `crawl-time-after` / `crawl-time-before`?)
   crawl-start-before:
     name: crawl-start-before
     type: string
@@ -354,8 +377,9 @@ parameters:
     in: query
     required: false
     description: >
-      Match resources that were crawled strictly before the time given
-      according to RFC3339.  See more detail at `crawl-start-after`.
+      Match resources that were crawled in a job that started strictly before
+      the time given according to RFC3339.  See more detail at
+      `crawl-start-after`.
   # collection (specific to Archive-It):
   collection:
     name: collection
