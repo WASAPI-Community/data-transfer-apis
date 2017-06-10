@@ -1,351 +1,365 @@
-# **WASAPI Data Transfer API Archive-It Specification v1.0**
+# **Archive-It WASAPI Data Transfer API v1.0**
 
 
 ## Introduction
 
-This document serves to specify Archive-It's implementation of v1.0 of the
-Web Archive Data Export API.  It also proposes and assumes changes to the
-minimum specification.
+This document serves to specify v1.0 of Archive-It's implementation of the WASAPI Data Transfer API.  It is intended to  document how a client can use the API to find and select web archive files for transfer and to submit jobs for the creation and transfer of derivative web archive files . The API is designed according to the WASAPI data transfer [general specification](https://github.com/WASAPI-Community/data-transfer-apis/tree/master/general-specification). For context, ss of June 2017 the Archive-It repository contains over 3,766,068 WARC files, all of which are accessible to the relevant, authenticated Archive-It partners via this API. 
+
+The interface provides two primary services:  querying existing files and managing jobs for creating derivative files. The WASAPI data transfer general specification does not mandate how to transfer the webdata files for export, but Archive-It's implementation provides straight-forward HTTPS links. We use the syntax `webdata` file to recognize that the API supports working with both web archive files (WARCs) as well as with derivative files created from WARCs (such as WATs or CDX). 
+
+## Authentication
+
+Archive-It restricts access to those clients with an Archive-It account.  The WASAPI data transfer general specification allows publicly accessible resources, so Archive-It's implementation will show empty results until you authenticate.  You have two options for authentication:
+
+### Authentication via browser cookies
+
+To try some simple queries or manually download your data with a web browser, you can authenticate with cookies in your web browser.
+
+Point your web browser to `https://partner.archive-it.org/login` and log in to your Archive-It account with your username and password.  This will set cookies in your browser for subsequent WASAPI requests and downloading files.
+
+### Authentication via basic access authentication
+
+For automated scripts, you should use http [basic access authentication](https://en.wikipedia.org/wiki/Basic_access_authentication).
+
+For example, if your account has username `teddy` and password `schellenberg`, you could use this [cURL](https://curl.haxx.se/) invocation:
+
+    curl --user teddy:schellenberg https://partner.archive-it.org/wasapi/v1/webdata
+
+## Querying
+
+Archive-It's data transfer API implementation, Archive-It lets you identify the webdata files via a number of parameters. Start building the URL for your query with `https://partner.archive-it.org/wasapi/v1/webdata`, then append parameters to make your specific query.
+
+To find all webdata files in your account:
+
+    https://partner.archive-it.org/wasapi/v1/webdata
+
+### Overview of Query Parameters
+
+The basic parameters for querying for webdata files are:
+
+- `filename`: the exact webdata filename
+- `filetype`:  the exact webdata files of a specific type, eg `warc`, `wat`, `cdx`
+- `collection`: Archive-It collection identifier
+- `crawl`: Archive-It crawl job identifier
+- `crawl-time-after` & `crawl-time-before`: date of webdata file creation during a crawl job
+- `crawl-start-after` & `crawl-start-before`: date of crawl job start
+
+### Query parameters
+
+#### `filename` query parameter
+
+The `filename` parameter restricts the query to include webdata files with the exact filename as the parameter's value.  That is, it must match the beginning and end of the filename; the full path of directories is ignored. API v1.0 matches exact filenames, but later version will recognize "globbing," i.e. matching with `*` and `?` patterns.
+
+To find a specific file:
+
+    https://partner.archive-it.org/wasapi/v1/webdata?filename=ARCHIVEIT-8232-WEEKLY-JOB300208-20170513202120098-00001.warc.gz
+
+#### `filetype` query parameter
+
+The `filetype` parameter restricts the query to those web archive files with the specified type, such as `warc`, `wat`, `cdx`.  API v1.0 supports query by `warc` and later version will support query by derivative formats.
+
+#### `collection` query parameter
+
+The `collection` parameter restricts the query to those web archive files within the specified collection. Archive-It users may want to reference the documentation on how to [find your collection's ID number](https://support.archive-it.org/hc/en-us/articles/208000916-Find-your-collection-s-ID-number).
+
+To find the files from the "Occupy Movement 2011/2012" collection:
+
+    https://partner.archive-it.org/wasapi/v1/webdata?collection=2950
+
+The API supports multiple `collection` parameters in a query. To find the files from the "Occupy Movement 2011/2012" collection and the "#blacklivesmatter Web Archive" collection:
+
+    https://partner.archive-it.org/wasapi/v1/webdata?collection=2950&collection=4783
+
+#### `crawl` query parameter
+
+The `crawl` parameter restricts the query to webdata files within a specified crawl, per the crawl job identifier. Archive-It users may want to reference the documentation on [how to find a crawl ID number](https://support.archive-it.org/hc/en-us/articles/115002803383-Finding-your-crawl-ID-number-). Some older Archive-It WARCs and webdata files lack an associated crawl job ID (and, thus, also an associated `crawl-start-time`). Efforts are underway to backfill this data, which should alleviate, if not eliminate, the null values for `crawl` for some historical WARCs. If users receive null results for a know `crawl` identifier, they should contact Archive-It support or use other parameters, which are known to be exhaustive historically.
+
+To find the files from a specific crawl:
+
+    https://partner.archive-it.org/wasapi/v1/webdata?crawl=300208
+
+#### `crawl-time-after` and `crawl-time-before` query parameters
+
+The `crawl-time-after` and `crawl-time-before` parameters restrict the query to those web archive files crawled within the given time range; see [time formats](#time-formats) for the syntax. Specify the lower bound (if any) with `crawl-time-after` and the upper bound (if any) `crawl-time-before`.  This field uses the time the WARC file was created, the same timestamp represented in the WARC filename.
+
+To find the files crawled in the first quarter of 2016:
+
+    https://partner.archive-it.org/wasapi/v1/webdata?crawl-time-after=2016-12-31&crawl-time-before=2016-04-01
+
+To find all files crawled since 2016:
+
+    https://partner.archive-it.org/wasapi/v1/webdata?crawl-time-after=2016-01-01
+    
+To find all files crawled prior to 2014:
+
+    https://partner.archive-it.org/wasapi/v1/webdata?crawl-time-before=2014-01-01
+
+#### `crawl-start-after` and `crawl-start-before` query parameters
+
+The `crawl-start-after` and `crawl-start-before` parameters restrict the query to those web archive files gathered from crawl jobs that started within the given time range; see [time formats](#time-formats) for the syntax.  They reference the crawl job start date (in contrast to `crawl-time-after` and `-before` which relate to the individual WARC file creation date).  Specify the lower bound (if any) with `crawl-start-after` and the upper bound (if any) `crawl-start-before`. Since `crawl-start` is associated with the `crawl` parameter, the above caveats will apply in that some older Archive-It WARCs and web archive files will lack an associated `crawl-start`. Efforts are underway to backfill this data, otherwise contact Archive-It support or use other parameters, which are known to be exhaustive historically.
+
+To find the files from a Q1 2016 crawl:
+
+      https://partner.archive-it.org/wasapi/v1/webdata?crawl-start-after=2016-12-31&crawl-start-before=2016-04-01
+
+To find all files from crawls started since 2016:
+
+    https://partner.archive-it.org/wasapi/v1/webdata?crawl-start-after=2016-01-01
+
+#### Pagination parameters
+
+The [parameters for pagination](#parameters-for-pagination) apply to queries.
+
+### Query results
+
+The response to a query is a JSON object with [fields for pagination](#fields-for-pagination), an `includes-extra` field, a `request-url` field, and the result in the `files` field.
+
+The `count` field represents the total number of web archive files corresponding to the query.
+
+The `includes-extra` field is currently always false in the API v1.0, as all query parameters return exact matches and the data in the `files` contains nothing extraneous from what is necessary to satisfy the query or job. The `includes-extra` field is mandated by the general specification as some implementations may return results that include webdata files containing content beyond the specific query. For instance, were `url` a query parameter, a request by URL could return results that contain webdata files (i.e. WARCs) that contain data from that URL as well as data from other URLs, due to the way crawlers write WARC files. When Archive-It (or other implementations) supports these type queries, `includes-extra` could have a true value to indicate that the referenced `files` may contain data outside the specific query.
+
+The `request-url` field represents the submitted query URL.
+
+The `files` field is a list of a subset (check the [pagination fields](#fields-for-pagination)) of the results of the query, with each webdata file represented by a JSON object with the following keys:
+
+- `account`:  the numeric Archive-It account identifier
+
+- `checksums`:  an object with `md5` and `sha1` keys and hexadecimal values of
+  the webdata file's checksums
+
+- `collection`:  the numeric Archive-It identifier of the collection that includes the
+  webdata file
+
+- `crawl`:  the numeric Archive-It identifier of the crawl that created the webdata file
+
+- `crawl-start`:  an optional RFC3339 date stamp of the time the crawl job started
+
+- `crawl-time`:  an RFC3339 date stamp of the time the webdata file was
+  [created](#crawl-time-after-and-crawl-time-before-query-parameters)
+
+- `filename`:  the name of the webdata file (without any path of directories)
+
+- `filetype`:  the format of the webdata file, eg `warc`, `wat`, `wane`, `cdx`
+
+- `locations`:  a list of sources from which to retrieve the webdata file
+
+- `size`:  the size in bytes of the webdata file
+
+For example:
+
+    {
+      "count": 601,
+      "includes-extra": false,
+      "next": "https://partner.archive-it.org/wasapi/v1/webdata?collection=8232&page=2",
+      "previous": null,
+      "files": [
+        {
+          "account": 1219,
+          "checksums": {
+            "md5": "073f2a905ce23462204606329ca545c3",
+            "sha1": "1b796f61dc22f2ca246fa7055e97cd25341bfe98"
+          },
+          "collection": 8232,
+          "crawl": 304244,
+          "crawl-start": "2017-05-31T22:15:34Z",
+          "crawl-time": "2017-05-31T22:15:40Z",
+          "filename": "ARCHIVEIT-8232-WEEKLY-JOB304244-20170531221540622-00000.warc.gz",
+          "filetype": "warc",
+          "locations": [
+            "https://warcs.archive-it.org/webdatafile/ARCHIVEIT-8232-WEEKLY-JOB304244-20170531221540622-00000.warc.gz"
+          ],
+          "size": 1000000858
+        },
+        {
+          "account": 1219,
+          "checksums": {
+            "md5": "610e1849cfc2ad692773348dd34697b4",
+            "sha1": "9048d063a9adaf606e1ec2321cde3a29a1ee6490"
+          },
+          "collection": 8232,
+          "crawl": 303042,
+          "crawl-start": "2017-05-24T22:15:36Z",
+          "crawl-time": "2017-05-26T17:51:37Z",
+          "filename": "ARCHIVEIT-8232-WEEKLY-JOB303042-20170526175137981-00002.warc.gz",
+          "filetype": "warc",
+          "locations": [
+            "https://warcs.archive-it.org/webdatafile/ARCHIVEIT-8232-WEEKLY-JOB303042-20170526175137981-00002.warc.gz"
+          ],
+          "size": 40723812
+        },
+        [ ... ]
+      ]
+    }
 
 
-## Proposed changes to the published minimum
+## Jobs
 
-After more experience, we suggest that the minimum specification should be
-adjusted.
+The Archive-It data transfer API allows users to submit "jobs" for the creation of derivative files from existing resources. The serves the broader goal of WASAPI data transfer APIs to facilitate use of web archives in data-driven scholarship, research and computational analysis, and to support use, and transport, of files derived from WARCs and original archival web data. The Archive-It WASAPI data transfer API v1.0 allows an Archive-It user or approved researcher to:
+
+- Submit a query and be returned a results list of webdata files
+- Submit a job to derive different types of datasets from that results list
+- Receive a job submission token and job submission status
+- Poll the API for current job status
+- Upon job completion, get a results list of the generated derived webdata files
+
+### Submitting a new job
+
+Submit a new job with an HTTP POST to `https://partner.archive-it.org/wasapi/v1/jobs`.
+
+Select a `function` from those supported. The Archive-It API v1.0 currently supports creation of three types of derivative datasets, all of which have a one-to-one correlation to WARC files. Future development will allow for job submission for original datasets. The current job `function` list:
+
+- `build-wat`: build a WAT (Web Archive Transformation) file from the matched web archive files
+
+- `build-wane`: build a WANE (Web Archive Name Entities) file from the matched  web archive files 
+
+- `build-cdx`: Build a CDX (Capture Index) file from the matched  web archive files
+
+For more on WATs and WANES, see their description at [Archive-It Research Services](https://webarchive.jira.com/wiki/display/ARS/Archive-It+Research+Services). For more on CDX, see the documentation for the [CDX Server API](https://github.com/internetarchive/wayback/blob/master/wayback-cdx-server/README.md).
+
+Build an appropriate `query` in the same manner as for the [`/webdata` endpoint](#query-parameters).
+
+For example, to build WAT files from the WARCs in Collection 4783 and crawled in 2016: 
+
+    curl --user teddy:schellenberg -H 'Content-Type: application/json' -d '{"function": "build-wat","query": "collection=4783&crawl-time-after=2016-01-01&crawl-time-before=2017-01-01"}' https://partner.archive-it.org/wasapi/v1/jobs
+
+If all goes well, the server will record the job, set its `submit-time` to the current time and its `state` to `queued`, and return a `201 Created` response, including a `jobtoken` which can be used to [check its
+status](#checking-the-status-of-a-job) later:
+
+    {
+      "account": 89,
+      "function": "build-wat",
+      "jobtoken": "136",
+      "query": "collection=4783&crawl-time-after=2016-01-01&crawl-time-before=2017-01-01",
+      "state": "queued",
+      "submit-time": "2017-06-03T22:49:13.869698Z",
+      "termination-time": null
+    }
+
+If you want to match everything, you must still provide an explicit empty string for the query parameter.  For example, to build a CDX index of all your resources:
+
+    curl --user teddy:schellenberg -H 'Content-Type: application/json' -d '{"function":"build-cdx","query":""}' https://partner.archive-it.org/wasapi/v1/jobs
+
+### Checking the status of a job
+
+To check the [state](#states-of-a-job) of your job, build a URL by appending its job token to `https://partner.archive-it.org/wasapi/v1/jobs/`.  For example:
+
+    curl --user teddy:schellenberg https://partner.archive-it.org/wasapi/v1/jobs/136
+
+Immediately after submitting it, the job will be in the `queued` state, and the response will be the same as the response to the submission.  Once Archive-It starts running the job, its `state` will change, for example:
+
+    {
+      "account": 89,
+      "function": "build-wat",
+      "jobtoken": "136",
+      "query": "collection=4783&crawl-time-after=2016-01-01&crawl-time-before=2017-01-01",
+      "state": "running",
+      "submit-time": "2017-06-03T22:49:13Z",
+      "termination-time": null
+    }
+
+And when it is `complete`, the `termination-time` will be set with the time:
+
+    {
+      "account": 1177,
+      "function": "build-wat",
+      "jobtoken": "136",
+      "query": "collection=4783&crawl-time-after=2016-01-01&crawl-time-before=2017-01-01",
+      "state": "complete",
+      "submit-time": "2017-06-03T22:49:13Z",
+      "termination-time": "2017-06-06T01:37:54Z"
+    }
+
+You can also check the [states](#states-of-a-job) of all your jobs at `https://partner.archive-it.org/wasapi/v1/jobs/`, which is [paginated](Pagination).  For example:
+
+    {
+      "count": 16,
+      "next": "http://partner.archive-it.org/wasapi/v1/jobs?page_size=10&page=2",
+      "previous": null,
+      "jobs": [
+        {
+          "account": 89,
+          "function": "build-cdx",
+          "jobtoken": "137",
+          "query": "",
+          "state": "running",
+          "submit-time": "2017-06-03T23:55:51Z",
+          "termination-time": null
+        },
+        {
+          "account": 1177,
+          "function": "build-wat",
+          "jobtoken": "136",
+          "query": "collection=4783&crawl-time-after=2016-01-01&crawl-time-before=2017-01-01",
+          "state": "completed",
+          "submit-time": "2017-06-03T22:49:13Z",
+          "termination-time": "2017-06-06T01:37:54Z"
+        },
+        [ ... ]
+      ]
+    }
+
+### Checking the result of a failed job
+
+If your job has a `failed` `state`, build a URL of the form `https://partner.archive-it.org/wasapi/v1/jobs/{jobtoken}/error`.  This is in development not currently implemented.
+
+### Checking the result of a complete job
+
+To retrieve the result of your `complete` job, build a URL of the form
+`https://partner.archive-it.org/wasapi/v1/jobs/{jobtoken}/result`.  This is in development and not yet implemented. Once implemented, the results of jobs will be able to be queried by filetype and by job result.
+
+## Common WASAPI infrastructure
 
 ### Pagination
 
-The specification should support pagination of large results.  Simple
-implementations may give the full results in a single page, but adding the
-syntax later would be difficult.
+Results of queries and lists of jobs are paginated.  The full results may fit on one page (especially if you set `page_size=2000`), but the syntax is always present.  You needn't manipulate the `page` parameter directly:  after your first request with no `page` parameter, you should iteratively follow non-null `next` links to fetch the full results.
 
-Unable to find consistent recommendations for pagination syntax, we adopt that
-of the [Django Rest Framework](http://www.django-rest-framework.org/).  The
-client must accept `count`, `previous`, and `next` parameters.  The
-implementation must provide the number of files/jobs/etc in `count`.  The
-`previous` and `next` values can be either URLs by which to fetch other pages
-of results using a `page` parameter, be absent, or (as the Django Rest
-Framework does) hold an explicit `null`.
+#### Fields for pagination
 
-### Matching filenames
+The top-level JSON object of the response includes pagination information with the following keys:
 
-Matching of filenames should consider only the basename and not any path of
-directories.  The glob pattern should be matched against the complete basename
-(ie must match the beginning and end of the filename).  An implementation that
-wants to match pathnames including directories (and consider eg whether `**`
-should match multiple directory separators eg `/`) may offer a different
-parameter.
+- `count`:  The number of items in the full result (files or jobs, across all
+  pages)
 
-### Simpler webdata file bundles
+- `previous`:  Link (if any) to the previous page of items; otherwise null
 
-We should drop `WebdataMenu` and `WebdataBundle`.  The multiple `locations` of
-a `WebdataFile` provide most of their value.  Rather than giving the client
-more information than would be used, an implementation can accept a request for
-specific transports and formats.
+- `next`:  Link (if any) to the next page of items; otherwise null
 
-### Separate endpoint for results of a job; reporting on a failed job
+#### Parameters for pagination
 
-We replace `completion-time` with `termination-time` to ease polling for new
-information about jobs.  Rather than a job that may include a successful result
-but gives the same indistinguishable lack of result for both progress and
-failure, we provide distinct endpoints:  `/jobs/{jobtoken}/result` for a
-successful result and `/jobs/{jobtoken}/error` for reporting the error of a
-failed job.  A client can easily poll `/jobs/{jobtoken}/result` and will be
-redirected to `/jobs/{jobtoken}/error` in the case that the job fails.
+##### `page` query parameter
 
-### Checksums of a webdata file
+The `page` parameter requests a specific page of the full result.  It defaults to 1, giving the first page.
 
-Since it is useless to require the presence of checksums without mandating any
-specific checksum, every implementation should provide at least one of MD5 or
-SHA1.  To allow evolution, the specification should use a dictionary instead of
-a single string.  To ensure interoperability, all checksums should be
-represented as hexadecimal strings.
-
-### Change label describing format of archive file
-
-Using the label `content-type` to describe the format of the archive files can
-be confused with the "content-type" or "MIME-type" of the resources within the
-archive.  The label `content-type` should be reserved as a potentially valuable
-parameter to select such resources, and the current use should be replaced with
-`filetype`.  Another label to consider is "archive-format" which explicitly
-references its subject.
-
-
-## Extensions beyond the published minimum
-
-Archive-It extends the minimum with our own special parameters.
-
-### Time range parameters
-
-We want to support date ranges, but we want to be careful about which time we
-refer to:  the instant the crawl was requested, the instant a delayed crawl was
-scheduled to start, the instant the crawl started, the instant the resource is
-retrieved, the instant the archive file was written.  For ease of
-implementation, we choose to operate on the time that the crawl started using
-the `crawl-start-after` and `crawl-start-before` parameters.
-
-### Collection parameter
-
-The `collection` parameter accepts a numeric collection identifier as is used
-in the Archive-It application.
-
-### Crawl parameter
-
-The `crawl` parameter accepts a numeric crawl identifier as is used in the
-Archive-It application.
-
-### Functions
-
-Archive-It supports jobs of three functions:
-- `build-wat`:  Build a WAT file with metadata from the matched archive files
-- `build-wane`:  Build a WANE file with the named entities from the matched
-  archive files
-- `build-cdx`:  Build a CDX file indexing the matched archive files
-
-Archive-It functions do not yet accept any parameters.
-
-### States of a job
-
-An Archive-It job can be described as being in one of five distinct states:
-- `queued`:  Job has been submitted and is waiting to run.
-- `running`:  Job is currently running.
-- `failed`:  Job ran but failed.
-- `complete`:  Job ran and successfully completed; result is available.
-- `gone`:  Job ran, but the result is no longer available (eg deleted to save
-  storage).
-
-
-
-## Paths & Examples
-
-### `/webdata`
-
-   *(example: `https://partner.archive-it.org/export/v1/webdata`)*
-
-The most basic query using the `/webdata` path returns a list of all web data
-files on the server which are available to the client, basic metadata about
-those files, and their download information. Parameters to modify `/webdata`
-will be determined by institutions building their own implementations.
-Potential parameters can be as simple as `/webdata?directoryName=[name]` or can
-support an extensive list of parameters to modify a request. Examples of
-possible parameters could include those defining identifiers for things like
-collection, seed, crawl job, harvest event, session, date range,
-archival identifier, administrative unit, repository, bucket, and more. All
-institution-specific query filters and modifiers should be parameters to the
-`/webdata` path.
-
-   * **Example queries and results**
-
-`https://partner.archive-it.org/export/v1/webdata?filename=2016-08-30-blah.warc.gz`
-
-The above query would return a list of a single WARC file (though it may be
-available from multiple mirrors).
-
-```
-{
-    "includes-extra": false,
-    "count": 1,
-    "previous": null,
-    "next": null,
-    "files": [
-        {
-            "filename": "2016-08-30-blah.warc.gz",
-            "filetype": "warc",
-            "checksum": [
-                "sha1:6b4f32a3408b1cd7db9372a63a2053c3ef25c731",
-                "md5:766ba6fd3a257edf35d9f42a8dd42a79"
-            ],
-            "size": 8642688,
-            "locations": [
-                "http://archive-it.org/.../2016-08-30-blah.warc.gz"
-            ]
-        }
-    ]
-}
-```
-
-`https://partner.archive-it.org/export/v1/webdata?collection=456&crawl-start-after=2014-01-01&crawl-start-before=2016-01-01`
-
-The above query would return a list of all the WARCs (with metadata and
-download links) from between January 1, 2014 and December 31, 2015 for Collection 456.
-
-```
-{
-    "includes-extra": false,
-    "count": 1,
-    "previous": null,
-    "next": null,
-    "files": [
-        {
-            "filename": "2016-08-30-blah.warc.gz",
-            "filetype": "warc",
-            "checksum": [
-                "sha1:6b4f32a3408b1cd7db9372a63a2053c3ef25c731",
-                "md5:766ba6fd3a257edf35d9f42a8dd42a79"
-            ],
-            "size": 8642688,
-            "locations": [
-                "http://archive-it.org/.../2014-01-01-blah.warc.gz",
-                "/ipfs/QmaCpDMGvV3BGHeYERUEnRQAwe3N8SzbUtfsmvsqQLuvuJ"
-            ]
-        },
-        {
-            "filename": "2014-01-02-blah.warc.gz",
-            "filetype": "warc",
-            "checksum": [
-                "sha1:8e4e78a274ffa59a972951b6a460791f92183ec8",
-                "md5:5360dbc1187c433b948413bb9f0bd114"
-            ],
-            "size": 8519232,
-            "locations": [
-                "http://archive-it.org/.../2014-01-02-blah.warc.gz",
-                "/ipfs/QmSoLju6m7xTh4DuokvT3886QRYqxAzb1kShaanJgW36yx"
-            ]
-        }
-    ]
-}
-```
-
-### `/jobs`
-
-   *(example: `https://partner.archive-it.org/export/v1/jobs`)*
-
-The `/jobs` path shows the jobs on this server accessible to the client. This
-enables the request and delivery of WARC derivative webdata files. The `/jobs`
-path supports GET and POST methods. Implementations that do not include the
-ability to submit a job should still support this path and simply return that no
-jobs are possible for the client on this server.
-
-   * **Example queries and results**
-
-`GET https://partner.archive-it.org/export/v1/jobs`
-
-Results here depend on whether jobs have been submitted. If no jobs have been
-submitted, you get an empty list. If you have submitted jobs, you get something
-similar to the below.
-
-```
-{
-    "count": 1,
-    "previous": null,
-    "next": null,
-    "jobs": [
-        {
-            "jobtoken": "1440",
-            "function": "build-wat",
-            "query": "collection=456&crawl-start-after=2014-01-01&crawl-start-before=2016-01-01",
-            "submit-time": "2016-12-08T16:05:44-0800",
-            "termination-time": "2016-12-08T16:14:25-0800",
-            "state": "complete"
-        }
-    ]
-}
-
-
-```
-
-`POST https://partner.archive-it.org/export/v1/jobs`
-
-The POST method includes a string matching a `/webdata` query string plus an
-implementation-specific function available to the client. In this
-specification, POST requests remain a bit of an abstraction, as they are
-dependent upon the implementation-specific parameters supported under
-`/webdata`.
-
-Using the previous `/webdata` example, the below POST request would return a
-job token for creating WATs for WARC files matching that `/webdata` query:
-
- `https://partner.archive-it.org/export/v1/jobs?collection=456&crawl-start-after=2014-01-01&crawl-start-before=2015-01-01&function=build-wat`
-
-```
-{
-    "jobtoken": "1440",
-    "function": "build-wat",
-    "query": "collection=456&crawl-start-after=2014-01-01&crawl-start-before=2015-01-01",
-    "submit-time": "2016-08-30Z15:52:53",
-    "state": "queued"
-}
-```
-
-### `/jobs/{jobToken}`
-
-   *(example: `https://partner.archive-it.org/export/v1/jobs/123456`)*
-
-The `/jobs/{jobToken}` path returns the status of a submitted job.
-
-   * **Example queries and results**
-
-`GET https://partner.archive-it.org/export/v1/jobs/123456`
-
-Retrieve status for a submitted job, some metadata, including the original
-query, time it was requested, whether it has completed ie current state, etc.
-
-```
-{
-    "jobtoken": "1440",
-    "function": "build-wat",
-    "query": "collection=456&crawl-start-after=2014-01-01&crawl-start-before=2015-01-01",
-    "submit-time": "2016-08-30Z15:52:53",
-    "termination-time": "2016-08-30Z15:59:13",
-    "state": "complete"
-}
-```
-
-
-### `/jobs/{jobToken}/result`
-
-   *(example: `https://partner.archive-it.org/export/v1/jobs/123456/result`)*
-
-The `/jobs/{jobToken}` path returns the result of a complete job.
-
-   * **Example queries and results**
-
-`GET https://partner.archive-it.org/export/v1/jobs/123456/result`
-
-Retrieve the result of a complete job. Results are not necessarily available
-indefinitely. May return "410 Gone" if derivatives generated by this job have
-been replaced (e.g. by the results of a newer job), or if job has been expired
-by some other policy. An implementation may (but is not required to) make
-results later available under /webdata queries.
-
-```
-{
-    "includes-extra": false,
-    "count": 2,
-    "previous": null,
-    "next": null,
-    "files": [
-        {
-            "filename": "123456.0.wat",
-            "filetype": "wat",
-            "checksum": [
-                "sha1:6b4f32a3408b1cd7db9372a63a2053c3ef25c731",
-                "md5:766ba6fd3a257edf35d9f42a8dd42a79"
-            ],
-            "size": 42688,
-            "locations": [
-                "http://archive-it.org/.../123456.0.wat"
-            ]
-        },
-        {
-            "filename": "123456.1.wat",
-            "filetype": "wat",
-            "checksum": [
-                "sha1:63439cd573560012dac9f78d5ddc29e66c5a3538",
-                "md5:5360dbc1187c433b948413bb9f0bd114"
-            ],
-            "size": 26452,
-            "locations": [
-                "http://archive-it.org/.../123456.1.wat"
-            ]
-        }
-    ]
-}
-```
+##### `page_size` query parameter
 
+The `page_size` parameter sets the size of each page.  It defaults to 100 and has a maximum value of 2000.
+
+### Time formats
+
+Date and time parameters should satisfy RFC3339, eg `YYYY-MM-DD` or `YYYY-MM-DDTHH:MM:SS`, always in [UTC](https://en.wikipedia.org/wiki/Coordinated_Universal_Time).
+
+The v1.0 of this release uses an inconsistent variety of date and time formats in order to align with the Archive-It web application.  It currently uses the Django Rest Framework's default parser which can't recognize abbreviated dates or timezones. Dates in its output including a trailing `Z` (indicating UTC) are also not recognized currently.  
+
+Archive-It will soon replace the parse with another one, in which case date queries will be supported at varying levels. For now:
+
+Formats that work:
+- `2017-01-01`
+- `2017-01-01T12:34:56`
+- `2017-01-01 12:34:56`
+
+Formats that the implementation does not recognize:
+- `2017`
+- `2017-01`
+- `20170101`
+- `2017-01-01T12:34:56Z`
+- `2017-01-01 12:34:56-0700`
+
+Archive-It is in the midst of creating a recipe book of sample API queries. Both Archive-It and WASAPI grant partners are also creating a number of local utilities for working with this API and implementing it in preservation and research workflows. These utilities will also be posted in this GitHub account for public reference. Stanford has created a number of demonstration videos outlining their tool development for working with this API for ingest of their Archive-It WARCs into their preservation repository. These can be seen in the [WASAPI collection](https://archive.org/details/wasapi) in the Internet Archive and Stanford Libraries' [YouTube channel](https://www.youtube.com/channel/UCc2CQuHkhKGZ-2ZLTZVGE2A).
+
+For Archive-It's proposed changes to the WASAPI data transfer API general specification and other build details, visit the [Archive-It implementation repository](https://github.com/WASAPI-Community/data-transfer-apis/tree/master/ait-implementation).
 
 ## Contacts
 
-*Internet Archive (Archive-It)*
+*Archive-It (Internet Archive)*
 * Jefferson Bailey, Director, Web Archiving, jefferson@archive.org
 * Mark Sullivan, Web Archiving Software Engineer, msullivan@archive.org
