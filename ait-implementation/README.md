@@ -144,3 +144,9 @@ An Archive-It job can be described as being in one of five distinct states:
 - `complete`:  Job ran and successfully completed; result is available.
 - `gone`:  Job ran, but the result is no longer available (eg deleted to save
   storage).
+
+## Contacts
+
+*Archive-It (Internet Archive)*
+* Jefferson Bailey, Director, Web Archiving, jefferson@archive.org
+* Mark Sullivan, Web Archiving Software Engineer, msullivan@archive.org
