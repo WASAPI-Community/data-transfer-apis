@@ -354,6 +354,8 @@ Formats that the implementation does not recognize:
 - `2017-01-01T12:34:56Z`
 - `2017-01-01 12:34:56-0700`
 
+## Recipes and other resources
+
 Archive-It is in the midst of creating a recipe book of sample API queries. Both Archive-It and WASAPI grant partners are also creating a number of local utilities for working with this API and implementing it in preservation and research workflows. These utilities will also be posted in this GitHub account for public reference. Stanford has created a number of demonstration videos outlining their tool development for working with this API for ingest of their Archive-It WARCs into their preservation repository. These can be seen in the [WASAPI collection](https://archive.org/details/wasapi) in the Internet Archive and Stanford Libraries' [YouTube channel](https://www.youtube.com/channel/UCc2CQuHkhKGZ-2ZLTZVGE2A).
 
 For Archive-It's proposed changes to the WASAPI data transfer API general specification and other build details, visit the [Archive-It implementation repository](https://github.com/WASAPI-Community/data-transfer-apis/tree/master/ait-implementation).
