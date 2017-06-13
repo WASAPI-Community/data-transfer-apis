@@ -3,9 +3,9 @@
 
 ## Introduction
 
-This document serves to specify v1.0 of Archive-It's implementation of the WASAPI Data Transfer API.  It is intended to  document how a client can use the API to find and select web archive files for transfer and to submit jobs for the creation and transfer of derivative web archive files . The API is designed according to the WASAPI data transfer [general specification](https://github.com/WASAPI-Community/data-transfer-apis/tree/master/general-specification). For context, ss of June 2017 the Archive-It repository contains over 3,766,068 WARC files, all of which are accessible to the relevant, authenticated Archive-It partners via this API. 
+This document serves to specify v1.0 of Archive-It's implementation of the WASAPI Data Transfer API.  It is intended to document how a client can use the API to find and select web archive files for transfer and to submit jobs for the creation and transfer of derivative web archive files. The API is designed according to the WASAPI data transfer [general specification](https://github.com/WASAPI-Community/data-transfer-apis/tree/master/general-specification). For context, as of June 2017 the Archive-It repository contains over 3,766,068 WARC files, all of which are accessible to the relevant, authenticated Archive-It partners via this API.
 
-The interface provides two primary services:  querying existing files and managing jobs for creating derivative files. The WASAPI data transfer general specification does not mandate how to transfer the webdata files for export, but Archive-It's implementation provides straight-forward HTTPS links. We use the syntax `webdata` file to recognize that the API supports working with both web archive files (WARCs) as well as with derivative files created from WARCs (such as WATs or CDX). 
+The interface provides two primary services:  querying existing files and managing jobs for creating derivative files. The WASAPI data transfer general specification does not mandate how to transfer the webdata files for export, but Archive-It's implementation provides straight-forward HTTPS links. We use the syntax `webdata` file to recognize that the API supports working with both web archive files (WARCs) as well as with derivative files created from WARCs (such as WATs or CDX).
 
 ## Authentication
 
@@ -194,7 +194,7 @@ For example:
 
 ## Jobs
 
-The Archive-It data transfer API allows users to submit "jobs" for the creation of derivative files from existing resources. The serves the broader goal of WASAPI data transfer APIs to facilitate use of web archives in data-driven scholarship, research and computational analysis, and to support use, and transport, of files derived from WARCs and original archival web data. The Archive-It WASAPI data transfer API v1.0 allows an Archive-It user or approved researcher to:
+The Archive-It data transfer API allows users to submit "jobs" for the creation of derivative files from existing resources. This serves the broader goal of WASAPI data transfer APIs to facilitate use of web archives in data-driven scholarship, research and computational analysis, and to support use, and transport, of files derived from WARCs and original archival web data. The Archive-It WASAPI data transfer API v1.0 allows an Archive-It user or approved researcher to:
 
 - Submit a query and be returned a results list of webdata files
 - Submit a job to derive different types of datasets from that results list
@@ -214,7 +214,7 @@ Select a `function` from those supported. The Archive-It API v1.0 currently supp
 
 - `build-cdx`: Build a CDX (Capture Index) file from the matched  web archive files
 
-For more on WATs and WANES, see their description at [Archive-It Research Services](https://webarchive.jira.com/wiki/display/ARS/Archive-It+Research+Services). For more on CDX, see the documentation for the [CDX Server API](https://github.com/internetarchive/wayback/blob/master/wayback-cdx-server/README.md).
+For more on WATs and WANEs, see their description at [Archive-It Research Services](https://webarchive.jira.com/wiki/display/ARS/Archive-It+Research+Services). For more on CDX, see the documentation for the [CDX Server API](https://github.com/internetarchive/wayback/blob/master/wayback-cdx-server/README.md).
 
 Build an appropriate `query` in the same manner as for the [`/webdata` endpoint](#query-parameters).
 
@@ -340,7 +340,7 @@ Date and time parameters should satisfy RFC3339, eg `YYYY-MM-DD` or `YYYY-MM-DDT
 
 The v1.0 of this release uses an inconsistent variety of date and time formats in order to align with the Archive-It web application.  It currently uses the Django Rest Framework's default parser which can't recognize abbreviated dates or timezones. Dates in its output including a trailing `Z` (indicating UTC) are also not recognized currently.  
 
-Archive-It will soon replace the parse with another one, in which case date queries will be supported at varying levels. For now:
+Archive-It will soon replace the parser with another one, in which case date queries will be supported at varying levels. For now:
 
 Formats that work:
 - `2017-01-01`
