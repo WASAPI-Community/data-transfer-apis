@@ -336,23 +336,16 @@ The `page_size` parameter sets the size of each page.  It defaults to 100 and ha
 
 ### Time formats
 
-Date and time parameters should satisfy RFC3339, eg `YYYY-MM-DD` or `YYYY-MM-DDTHH:MM:SS`, always in [UTC](https://en.wikipedia.org/wiki/Coordinated_Universal_Time).
-
-The v1.0 of this release uses an inconsistent variety of date and time formats in order to align with the Archive-It web application.  It currently uses the Django Rest Framework's default parser which can't recognize abbreviated dates or timezones. Dates in its output including a trailing `Z` (indicating UTC) are also not recognized currently.  
-
-Archive-It will soon replace the parser with another one, in which case date queries will be supported at varying levels. For now:
+Date and time parameters should satisfy RFC3339, eg `YYYY-MM-DD` or `YYYY-MM-DDTHH:MM:SS`, but Archive-It also recognizes abbreviations like `YYYY-MM` or `YYYY` which are interpreted as the first of the month or year.  We recommend using [UTC](https://en.wikipedia.org/wiki/Coordinated_Universal_Time), but the implementation does now recognize a trailing `Z` or timezone offset.
 
 Formats that work:
 - `2017-01-01`
 - `2017-01-01T12:34:56`
 - `2017-01-01 12:34:56`
-
-Formats that the implementation does not recognize:
-- `2017`
-- `2017-01`
-- `20170101`
 - `2017-01-01T12:34:56Z`
 - `2017-01-01 12:34:56-0700`
+- `2017`
+- `2017-01`
 
 ## Recipes and other resources
 
