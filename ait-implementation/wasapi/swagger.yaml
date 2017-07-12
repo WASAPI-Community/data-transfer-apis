@@ -33,6 +33,8 @@ paths:
         - $ref: '#/parameters/filename'
         - $ref: '#/parameters/filetype'
         # specific to Archive-It
+        - $ref: '#/parameters/crawl-time-after'
+        - $ref: '#/parameters/crawl-time-before'
         - $ref: '#/parameters/crawl-start-after'
         - $ref: '#/parameters/crawl-start-before'
         - $ref: '#/parameters/collection'
@@ -61,6 +63,7 @@ paths:
           schema:
             type: object
             required:
+              - count
               - jobs
             properties:
               count:
@@ -233,6 +236,10 @@ definitions:
         type: integer
         format: int64
         description: The numeric ID of the crawl
+      crawl-time:
+        type: string
+        format: date-time
+        description: Time the original content of the file was crawled
       crawl-start:
         type: string
         format: date-time
@@ -415,7 +422,7 @@ parameters:
       scale between days and seconds.  That is, we specify ranges in the manner
       of the C programming language, eg low ≤ x < high.  For example, matching
       the month of November of 2016 is specified by
-      `crawl-time-after=2016-11-01 & crawl-time-before=2016-12-01` or
+      `crawl-time-after=2016-11 & crawl-time-before=2016-12` or
       equivalently by `crawl-time-after=2016-11-01T00:00:00Z &
       crawl-time-before=2016-11-30T16:00:00-08:00`.
   crawl-time-before:

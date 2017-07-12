@@ -341,15 +341,17 @@ parameters:
     required: false
     description: >
       Match resources that were crawled at or after the time given according to
-      RFC3339.  A date given with no time of day means midnight UTC.  The
-      current implementation does not support any expression of timezones.
+      RFC3339.  A date given with no time of day means midnight.  Coordinated
+      Universal (UTC) is preferrred and assumed if no timezone is included.
       Because `crawl-time-after` matches equal time stamps while
       `crawl-time-before` excludes equal time stamps, and because we specify
       instants rather than durations implicit from our units, we can smoothly
       scale between days and seconds.  That is, we specify ranges in the manner
       of the C programming language, eg low ≤ x < high.  For example, matching
       the month of November of 2016 is specified by
-      `crawl-time-after=2016-11-01 & crawl-time-before=2016-12-01`.
+      `crawl-time-after=2016-11 & crawl-time-before=2016-12` or
+      equivalently by `crawl-time-after=2016-11-01T00:00:00Z &
+      crawl-time-before=2016-11-30T16:00:00-08:00`.
   crawl-time-before:
     name: crawl-time-before
     type: string

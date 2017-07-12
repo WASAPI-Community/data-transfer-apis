@@ -14,6 +14,8 @@ To use the `wasapi` application within another Django project, you must resolve 
 
 Archive-It's webdata files are modeled in `archiveit.archiveit.models.WarcFile`; replace that with your own.
 
+The `AitWasapiDateTimeField` field replaces `django.db.models.fields.DateTimeField` with the ability to parse abbreviated dates and adjust dates with timezones.
+
 The URL paths to the WASAPI endpoints (and also transport of webdata files) were established in `archiveit/urls.py`; add your own reference to your own routing file (as appropriate for the version of Django you are using):
 
     urlpatterns = (

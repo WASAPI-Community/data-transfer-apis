@@ -3,6 +3,7 @@ from django.core.urlresolvers import reverse
 from django.db import models
 from .mailer import new_wasapijob
 from django.db.models.signals import post_save
+from archiveit.archiveit.model_fields import AitWasapiDateTimeField
 
 class WasapiJob(models.Model):
 
@@ -22,8 +23,8 @@ class WasapiJob(models.Model):
     function = models.CharField(max_length=32, null=False, choices=FUNCTION_CHOICES)
 
     query = models.CharField(max_length=1024, blank=True, null=False)
-    submit_time = models.DateTimeField(db_column='submitTime', auto_now_add=True, null=False)
-    termination_time = models.DateTimeField(db_column='terminationTime', null=True, blank=True)
+    submit_time = AitWasapiDateTimeField(db_column='submitTime', auto_now_add=True, null=False)
+    termination_time = AitWasapiDateTimeField(db_column='terminationTime', null=True, blank=True)
 
     # This list of states is specific to Archive-It:
     STATES = [
