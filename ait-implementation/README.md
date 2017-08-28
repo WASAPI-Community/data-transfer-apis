@@ -124,7 +124,8 @@ the `crawl-start-after` and `crawl-start-before` parameters.
 ### Collection parameter
 
 The `collection` parameter accepts a numeric collection identifier as is used
-in the Archive-It application.
+in the Archive-It application; multiple parameters allow matching files across
+multiple collections.
 
 ### Crawl parameter
 
