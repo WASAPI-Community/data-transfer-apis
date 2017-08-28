@@ -1,3 +1,7 @@
+# Introduction
+
+This document should assist developers in building their own implementation of WASAPI based on Archive-It's implementation.
+
 # Archive-It WASAPI implementation
 
 The `archiveit/wasapi` application is the bulk of the code by which Archive-It implements the WASAPI specification.  It was written within and then extracted from the [Django](https://www.djangoproject.com/) project (version 1.8.5) that serves [Archive-It's partner site](https://partner.archive-it.org/), so --while it can not be run alone-- it can be fit easily into another Django project. This document outlines implementation details, proposed changes to the WASAPI Data Transfer API general specification and the Archive-It additions beyond the minimum specifications.
