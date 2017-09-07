@@ -23,7 +23,7 @@ For automated scripts, you should use http [basic access authentication](https:/
 
 For example, if your account has username `teddy` and password `schellenberg`, you could use this [cURL](https://curl.haxx.se/) invocation:
 
-    curl --user teddy:schellenberg https://partner.archive-it.org/wasapi/v1/webdata
+    curl --user 'teddy:schellenberg' https://partner.archive-it.org/wasapi/v1/webdata
 
 ## Querying
 
@@ -220,7 +220,7 @@ Build an appropriate `query` in the same manner as for the [`/webdata` endpoint]
 
 For example, to build WAT files from the WARCs in Collection 4783 and crawled in 2016: 
 
-    curl --user teddy:schellenberg -H 'Content-Type: application/json' -d '{"function": "build-wat","query": "collection=4783&crawl-time-after=2016-01-01&crawl-time-before=2017-01-01"}' https://partner.archive-it.org/wasapi/v1/jobs
+    curl --user 'teddy:schellenberg' -H 'Content-Type: application/json' -d '{"function": "build-wat","query": "collection=4783&crawl-time-after=2016-01-01&crawl-time-before=2017-01-01"}' https://partner.archive-it.org/wasapi/v1/jobs
 
 If all goes well, the server will record the job, set its `submit-time` to the current time and its `state` to `queued`, and return a `201 Created` response, including a `jobtoken` which can be used to [check its
 status](#checking-the-status-of-a-job) later:
@@ -237,13 +237,13 @@ status](#checking-the-status-of-a-job) later:
 
 If you want to match everything, you must still provide an explicit empty string for the query parameter.  For example, to build a CDX index of all your resources:
 
-    curl --user teddy:schellenberg -H 'Content-Type: application/json' -d '{"function":"build-cdx","query":""}' https://partner.archive-it.org/wasapi/v1/jobs
+    curl --user 'teddy:schellenberg' -H 'Content-Type: application/json' -d '{"function":"build-cdx","query":""}' https://partner.archive-it.org/wasapi/v1/jobs
 
 ### Checking the status of a job
 
 To check the [state](#states-of-a-job) of your job, build a URL by appending its job token to `https://partner.archive-it.org/wasapi/v1/jobs/`.  For example:
 
-    curl --user teddy:schellenberg https://partner.archive-it.org/wasapi/v1/jobs/136
+    curl --user 'teddy:schellenberg' https://partner.archive-it.org/wasapi/v1/jobs/136
 
 Immediately after submitting it, the job will be in the `queued` `state`, and the response will be the same as the response to the submission.  Once Archive-It starts running the job, its `state` will change, for example:
 
