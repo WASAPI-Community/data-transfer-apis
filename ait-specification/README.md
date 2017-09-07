@@ -89,7 +89,7 @@ To find the files crawled in the first quarter of 2016:
 To find all files crawled since 2016:
 
     https://partner.archive-it.org/wasapi/v1/webdata?crawl-time-after=2016-01-01
-    
+
 To find all files crawled prior to 2014:
 
     https://partner.archive-it.org/wasapi/v1/webdata?crawl-time-before=2014-01-01
@@ -245,7 +245,7 @@ To check the [state](#states-of-a-job) of your job, build a URL by appending its
 
     curl --user teddy:schellenberg https://partner.archive-it.org/wasapi/v1/jobs/136
 
-Immediately after submitting it, the job will be in the `queued` state, and the response will be the same as the response to the submission.  Once Archive-It starts running the job, its `state` will change, for example:
+Immediately after submitting it, the job will be in the `queued` `state`, and the response will be the same as the response to the submission.  Once Archive-It starts running the job, its `state` will change, for example:
 
     {
       "account": 89,
@@ -300,7 +300,7 @@ You can also check the [states](#states-of-a-job) of all your jobs at `https://p
 
 ### Checking the result of a failed job
 
-If your job has a `failed` `state`, build a URL of the form `https://partner.archive-it.org/wasapi/v1/jobs/{jobtoken}/error`.  This is in development not currently implemented.
+If your job has a `failed` `state`, build a URL of the form `https://partner.archive-it.org/wasapi/v1/jobs/{jobtoken}/error`.  This is in development and not currently implemented.
 
 ### Checking the result of a complete job
 
