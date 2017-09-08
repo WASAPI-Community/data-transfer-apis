@@ -218,7 +218,7 @@ For more on WATs and WANEs, see their description at [Archive-It Research Servic
 
 Build an appropriate `query` in the same manner as for the [`/webdata` endpoint](#query-parameters).
 
-For example, to build WAT files from the WARCs in Collection 4783 and crawled in 2016: 
+For example, to build WAT files from the WARCs in collection 4783 and crawled in 2016:
 
     curl --user 'teddy:schellenberg' -H 'Content-Type: application/json' -d '{"function": "build-wat","query": "collection=4783&crawl-time-after=2016-01-01&crawl-time-before=2017-01-01"}' https://partner.archive-it.org/wasapi/v1/jobs
 
