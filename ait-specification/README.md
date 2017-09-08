@@ -269,7 +269,7 @@ And when it is `complete`, the `termination-time` will be set with the time:
       "termination-time": "2017-06-06T01:37:54Z"
     }
 
-You can also check the [states](#states-of-a-job) of all your jobs at `https://partner.archive-it.org/wasapi/v1/jobs`, which is [paginated](Pagination).  For example:
+You can also check the [states](#states-of-a-job) of all your jobs at `https://partner.archive-it.org/wasapi/v1/jobs`, which is [paginated](#pagination).  For example:
 
     {
       "count": 16,
@@ -304,7 +304,7 @@ If your job has a `failed` `state`, build a URL of the form `https://partner.arc
 
 ### Checking the result of a complete job
 
-To retrieve the result of your `complete` job, build a URL of the form `https://partner.archive-it.org/wasapi/v1/jobs/{jobtoken}/result`.  The response is similar to [results of a query](Query results).  For example:
+To retrieve the result of your `complete` job, build a URL of the form `https://partner.archive-it.org/wasapi/v1/jobs/{jobtoken}/result`.  The response is similar to [results of a query](#query-results).  For example:
 
     {
       "count": 4,
