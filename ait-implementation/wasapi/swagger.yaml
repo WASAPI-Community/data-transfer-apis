@@ -462,7 +462,11 @@ parameters:
     in: query
     required: false
     description: >
-      The numeric ID of the collection
+      The numeric ID of one or more collections, given as separate fields.
+      For only this parameter, WASAPI accepts multiple values and will match
+      items in any of the specified collections.  For example, matching the
+      items from two collections can be specified by `collection=1 &
+      collection=2`.
   # crawl (specific to Archive-It):
   crawl:
     name: crawl

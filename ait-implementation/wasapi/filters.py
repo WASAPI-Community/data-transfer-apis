@@ -1,60 +1,38 @@
 from rest_framework.filters import BaseFilterBackend
+from archiveit.wasapi.selectors import select_webdata_query, select_auth
+
+# A few words about selectors and "guts":  We want to share functionality
+# between the "webdata" query and selecting the source files for a job, but
+# those two clients have different information in different structures.
+# Therefore, we extract (most of) the guts from the filter_queryset methods
+# into functions in selectors.py, giving them a different interface (narrower
+# than Django's, ie a querydict and kwargs that may or may not include an
+# account that may or may not get used) which WasapiJob.set_ideal_result can
+# use.
+
+class WasapiWebdataQueryFilterBackend(BaseFilterBackend):
+    """Filtering on composition necessary for the webdata query"""
+
+    def filter_queryset(self, request, queryset, view):
+        return select_webdata_query(request.GET, queryset,
+          account=request.user.account, user=request.user)
 
 
 class WasapiAuthFilterBackend(BaseFilterBackend):
     """Filtering on authorization"""
-
     def filter_queryset(self, request, queryset, view):
+        return select_auth(request.GET, queryset,
+          account=request.user.account, user=request.user)
+
+
+class WasapiAuthJobBackend(BaseFilterBackend):
+    """Filtering on authorization to see the specific job"""
+    def filter_queryset(self, request, queryset, view):
+        # TODO:   raise http error rather than empty result
+        queryset = queryset.filter(job_id=view.kwargs['jobid'])
         if request.user.is_superuser:
             return queryset  # no restriction
-        if request.user.is_anonymous():
+        elif request.user.is_anonymous():
             return queryset.none()  # ie hide it all
-        return queryset.filter(account_id=request.user.account_id)
-
-
-class FieldFilterBackend(BaseFilterBackend):
-    """Simple filtering on equality and inclusion of fields
-
-    Any given field that is included in the class's multi_field_names is tested
-    against any of potentially multiple arguments given in the request.  Any
-    other (existing) field is tested for equality with the given value."""
-
-    multi_field_names = set()
-    def filter_queryset(self, request, queryset, view):
-        field_names = set( field.name for field in queryset.model._meta.get_fields() )
-        for key, value in request.GET.items():
-            if key in self.multi_field_names:
-                filter_value = { key+'__in': request.QUERY_PARAMS.getlist(key) }
-                queryset = queryset.filter(**filter_value)
-            elif key in field_names:
-                queryset = queryset.filter(**{ key:value })
-        return queryset
-
-
-class WebdataFieldFilterBackend(FieldFilterBackend):
-    multi_field_names = {'collection'}
-
-
-class MappedFieldFilterBackend(BaseFilterBackend):
-    """Map parameters to ORM filters
-
-    Based on `filter_for_parameter` dictionary mapping HTTP parameter name to
-    ORM query filter"""
-
-    def filter_queryset(self, request, queryset, view):
-        for parameter_name, filter_name in self.filter_for_parameter.items():
-            value = request.GET.get(parameter_name)
-            if value:
-                queryset = queryset.filter(**{filter_name:value})
-        return queryset
-
-
-class WebdataMappedFieldFilterBackend(MappedFieldFilterBackend):
-    """Wasapi-specific queries beyond what DRF provides"""
-    filter_for_parameter = {
-      'crawl': 'crawl_job_id',
-      'crawl-time-after': 'crawl_time__gte',
-      'crawl-time-before': 'crawl_time__lt',
-      'crawl-start-after': 'crawl_job__original_start_date__gte',
-      'crawl-start-before': 'crawl_job__original_start_date__lt',
-    }
+        else:
+            return queryset.filter(job__account=request.user.account)

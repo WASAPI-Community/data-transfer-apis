@@ -1,9 +1,10 @@
+from django.http import HttpResponse
 from rest_framework import viewsets
 from rest_framework.response import Response
 from archiveit.wasapi.serializers import WebdataFileSerializer, PaginationSerializerOfFiles, JobSerializer, PaginationSerializerOfJobs
-from archiveit.wasapi.filters import WasapiAuthFilterBackend, WebdataFieldFilterBackend, WebdataMappedFieldFilterBackend
+from archiveit.wasapi.filters import WasapiWebdataQueryFilterBackend, WasapiAuthFilterBackend, WasapiAuthJobBackend
 from archiveit.archiveit.models import WarcFile
-from archiveit.wasapi.models import WasapiJob
+from archiveit.wasapi.models import WasapiJob, WasapiJobResultFile
 
 
 class WebdataQueryViewSet(viewsets.ModelViewSet):
@@ -13,10 +14,8 @@ class WebdataQueryViewSet(viewsets.ModelViewSet):
     # TODO:  decide how to order results
     queryset = WarcFile.objects.all().order_by('-id')
     serializer_class = WebdataFileSerializer
-    filter_backends = [
-      WasapiAuthFilterBackend,
-      WebdataFieldFilterBackend,
-      WebdataMappedFieldFilterBackend]
+    # selector shared with WasapiJob.query_just_like_webdataqueryviewset
+    filter_backends = [WasapiWebdataQueryFilterBackend]
     pagination_serializer_class = PaginationSerializerOfFiles
     paginate_by_param = 'page_size'
     paginate_by = 100
@@ -29,7 +28,7 @@ class WebdataQueryViewSet(viewsets.ModelViewSet):
         page = self.paginate_queryset(self.object_list)
         serializer = self.get_pagination_serializer(page)
         # The change to add other fields:
-        # The current implemenation doesn't support any query that could
+        # The current implementation doesn't support any query that could
         # include extra data, so we can hard-code False.  We must revisit
         # this as we add other queries.
         serializer.fields['includes-extra'] = WedgeValueIntoObjectField(
@@ -47,6 +46,30 @@ class JobsViewSet(viewsets.ModelViewSet):
     serializer_class = JobSerializer
     filter_backends = [WasapiAuthFilterBackend]
     pagination_serializer_class = PaginationSerializerOfJobs
+    paginate_by_param = 'page_size'
+    paginate_by = 100
+    max_paginate_by = 2000
+
+
+def update_result_file_state(request, filename):
+    result_files = WasapiJobResultFile.objects.filter(filename=filename)
+    if not result_files:
+        return HttpResponse("", status=404)
+    WasapiJobResultFile.update_states(result_files)
+    return HttpResponse("")
+
+
+class JobResultViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that gives the result of a WASAPI job.
+    """
+    queryset = WasapiJobResultFile.objects.all().order_by('-id')
+    serializer_class = WebdataFileSerializer
+    filter_backends = [
+      WasapiAuthJobBackend
+      # don't need WasapiAuthFilterBackend since we already filtered on the job
+    ]
+    pagination_serializer_class = PaginationSerializerOfFiles
     paginate_by_param = 'page_size'
     paginate_by = 100
     max_paginate_by = 2000

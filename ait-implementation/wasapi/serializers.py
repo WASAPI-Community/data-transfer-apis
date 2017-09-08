@@ -9,22 +9,22 @@ from archiveit.wasapi.models import WasapiJob
 class WebdataFileSerializer(serializers.HyperlinkedModelSerializer):
     # explicitly adding to locals() lets us include '-' in name of fields
     locals().update({
-      'filetype': serializers.SerializerMethodField('filetype_method'),
+      'filetype': serializers.CharField(),
       'checksums': serializers.SerializerMethodField('checksums_method'),
       'account': serializers.SerializerMethodField('account_method'),
-      'collection': serializers.PrimaryKeyRelatedField(),
+      'collection': serializers.SerializerMethodField('collection_method'),
       'crawl': serializers.SerializerMethodField('crawl_method'),
       'crawl-time': serializers.DateTimeField(source='crawl_time'),
       'crawl-start': serializers.SerializerMethodField('crawl_start_method'),
       'locations': serializers.SerializerMethodField('locations_method')})
-    def filetype_method(self, obj):
-        return "warc"
     def checksums_method(self, obj):
         return {
           'sha1': obj.sha1,
           'md5': obj.md5 }
     def account_method(self, obj):
         return obj.account_id
+    def collection_method(self, obj):
+        return obj.collection_id
     def crawl_method(self, obj):
         return obj.crawl_job_id
     def crawl_start_method(self, obj):
@@ -32,8 +32,8 @@ class WebdataFileSerializer(serializers.HyperlinkedModelSerializer):
         return crawl_job and crawl_job.original_start_date
     def locations_method(self, obj):
         return (
-          [settings.WEBDATA_LOCATION_TEMPLATE % obj.__dict__] +
-          ([settings.PBOX_LOCATION_TEMPLATE % obj.__dict__]
+          [settings.WEBDATA_LOCATION_TEMPLATE % obj.dict_for_location()] +
+          ([settings.PBOX_LOCATION_TEMPLATE % obj.dict_for_location()]
             if obj.pbox_item else []));
     class Meta:
         model = WarcFile
@@ -84,13 +84,9 @@ class JobSerializer(serializers.HyperlinkedModelSerializer):
         # don't get called.
         # It would be nice if we let each field set its value, but I don't see
         # an easy way to do that.
-        value = self.set_state(value)
         value = self.set_account(value)
+        value = self.set_user(value)
         value = self.set_submit_time(value)
-        return value
-
-    def set_state(self, value):
-        value['state'] = WasapiJob.QUEUED
         return value
 
     def set_account(self, value):
@@ -98,6 +94,10 @@ class JobSerializer(serializers.HyperlinkedModelSerializer):
         if not account:  # eg "system" user
             raise PermissionDenied
         value['account'] = account
+        return value
+
+    def set_user(self, value):
+        value['user'] = self.context['request'].user
         return value
 
     def set_submit_time(self, value):

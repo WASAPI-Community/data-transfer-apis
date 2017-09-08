@@ -6,7 +6,7 @@ from django.conf import settings
 
 from internetarchive import get_session
 
-from archiveit.archiveit.models import WarcFile
+from archiveit.archiveit.models import WarcFile, DerivativeFile
 from archiveit.webdata.decorators import logged_in_or_basicauth
 
 VERBOTEN_FILENAMES = re.compile(r'EXTRACTED|EXTRACTION|HISTORICAL')
@@ -32,17 +32,19 @@ def index(request, filename):
           content_type='text/plain', status=403)
 
     # fetch the file's db record:
-    warcfile = WarcFile.objects.filter(filename=filename).first()
-    if not warcfile:
+    webdatafile = (
+      WarcFile.objects.filter(filename=filename).first() or
+      DerivativeFile.objects.filter(filename=filename).first() )
+    if not webdatafile:
         return HttpResponse('404 Not Found',
           content_type='text/plain', status=404)
 
     # get the file's content from somewhere:
     stream = (
-      warcfile.pbox_item and
-        stream_from_pbox(warcfile.pbox_item, filename) or
-      warcfile.hdfs_path and
-        stream_from_hdfs(warcfile.hdfs_path, filename) )
+      webdatafile.pbox_item and
+        stream_from_pbox(webdatafile.pbox_item, filename) or
+      webdatafile.hdfs_path and
+        stream_from_hdfs(webdatafile.hdfs_path, filename) )
     if not stream:
       return HttpResponse("500 Can't fetch file",
         content_type='text/plain', status=500)
@@ -50,7 +52,7 @@ def index(request, filename):
     # give it all back to the client:
     response = FileResponse(stream)
     response['Content-Type'] = 'application/octet-stream'
-    response['Content-Length'] = warcfile.size
+    response['Content-Length'] = webdatafile.size
     return response
 
 def stream_from_pbox(itemname, filename):

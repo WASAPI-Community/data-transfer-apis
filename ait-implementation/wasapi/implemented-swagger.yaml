@@ -130,6 +130,19 @@ paths:
           description: The request could not be interpreted
         '404':
           description: No such job visible to this client
+  '/jobs/{jobtoken}/result':
+    get:
+      summary: What is the result of my job?
+      description: >
+        For a complete job, produces a page of the resulting files.
+      parameters:
+        - $ref: '#/parameters/page'
+        - $ref: '#/parameters/jobtoken'
+      responses:
+        '200':
+          description: Success
+          schema:
+            $ref: '#/definitions/FileSet'
 definitions:
   WebdataFile:
     description: >
@@ -389,7 +402,11 @@ parameters:
     in: query
     required: false
     description: >
-      The numeric ID of the collection
+      The numeric ID of one or more collections, given as separate fields.
+      For only this parameter, WASAPI accepts multiple values and will match
+      items in any of the specified collections.  For example, matching the
+      items from two collections can be specified by `collection=1 &
+      collection=2`.
   # crawl (specific to Archive-It):
   crawl:
     name: crawl
