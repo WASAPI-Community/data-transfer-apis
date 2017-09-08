@@ -304,8 +304,51 @@ If your job has a `failed` `state`, build a URL of the form `https://partner.arc
 
 ### Checking the result of a complete job
 
-To retrieve the result of your `complete` job, build a URL of the form
-`https://partner.archive-it.org/wasapi/v1/jobs/{jobtoken}/result`.  This is in development and not yet implemented. Once implemented, the results of jobs will be able to be queried by filetype and by job result.
+To retrieve the result of your `complete` job, build a URL of the form `https://partner.archive-it.org/wasapi/v1/jobs/{jobtoken}/result`.  The response is similar to [results of a query](Query results).  For example:
+
+    {
+      "count": 4,
+      "next": null,
+      "previous": null,
+      "files": [
+        {
+          "account": 89,
+          "checksums": {
+            "md5": "11a0ddb3575da3b9f6dd9dff665ce181",
+            "sha1": "0b2a17969b8b45fc14e41441c1ecc7afcf974150"
+          },
+          "collection": 4783,
+          "crawl": 16473,
+          "crawl-start": "2016-05-12T15:05:31Z",
+          "crawl-time": "2016-05-12T15:05:36Z",
+          "filename": "ARCHIVEIT-4783-TEST-JOB16473-20160512150536534-00000_warc.wat.gz",
+          "filetype": "wat",
+          "locations": [
+            "https://warcs.archive-it.org/webdatafile/ARCHIVEIT-4783-TEST-JOB16473-20160512150536534-00000_warc.wat.gz",
+          ],
+          "size": 8016108
+        },
+        {
+          "account": 89,
+          "checksums": {
+            "md5": "f762e933a3fd412325e6497457ea2be0",
+            "sha1": "08beda59a9b6df9a26ea4783f69d92fd1d1ba5c2"
+          },
+          "collection": 4783,
+          "crawl": 16473,
+          "crawl-start": "2016-05-12T15:05:31Z",
+          "crawl-time": "2016-05-12T15:05:36Z",
+          "filename": "ARCHIVEIT-4783-CRAWL_SELECTED_SEEDS-JOB16472-20160512144021684-00000_warc.wat.gz",
+          "filetype": "wat",
+          "locations": [
+            "https://warcs.archive-it.org/webdatafile/ARCHIVEIT-4783-CRAWL_SELECTED_SEEDS-JOB16472-20160512144021684-00000_warc.wat.gz"
+          ],
+          "size": 149888
+        },
+        [ ... ]
+      ]
+    }
+
 
 ## Common WASAPI infrastructure
 
