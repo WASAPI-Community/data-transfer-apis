@@ -2,6 +2,11 @@
 
 This is the public repository for work on the Web Archiving Systems API (WASAPI) data transfer APIs. The intention for these APIs is to provide a standardized mechanism for export and import of web archive data (and perhaps, ultimately, derivative data and capture metadata) between diverse systems for preservation, replication, research use, data delivery, and other purposes. Design and development is being carried out by project partners on the [Institute of Museum and Library Services](https://www.imls.gov/)-funded [National Leadership Grant](https://www.imls.gov/grants/available/national-leadership-grants-libraries), [LG-71-15-0174](https://www.imls.gov/grants/awarded/lg-71-15-0174-15), "[Systems Interoperability and Collaborative Development for Web Archiving](https://www.imls.gov/sites/default/files/proposal_narritive_lg-71-15-0174_internet_archive.pdf)" (PDF) in consultation with a technical working group and based on feedback from the web archiving community.
 
+## Clients & Utilities
+* Stanford University Digital Library Systems and Services: wasapi-downloader, https://github.com/sul-dlss/wasapi-downloader
+* UNT Libraries: py-wasapi-client, https://github.com/unt-libraries/py-wasapi-client
+* LOCKSS: LAAWS Live Demo, http://demo.laaws.lockss.org/
+
 ## Documents
 * 2017-04-23: "[National Symposium on Web Archiving Interoperability: Agenda & Presentation Links](https://docs.google.com/document/d/1PM8u5nxAKUFb4oh1JTDARfl9hat7gOxgU1t2mGvn8Fg/edit#heading=h.n0bnn4za99v2)"
 * 2017-03-30: "[IMLS Year 1 Interim Performance Report Narrative](https://archive.org/details/WASAPIYearOneReport)"
