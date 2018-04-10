@@ -6,6 +6,7 @@ This is the public repository for work on the Web Archiving Systems API (WASAPI)
 * Stanford University Digital Library Systems and Services: wasapi-downloader, https://github.com/sul-dlss/wasapi-downloader
 * UNT Libraries: py-wasapi-client, https://github.com/unt-libraries/py-wasapi-client
 * LOCKSS: LAAWS Live Demo, http://demo.laaws.lockss.org/
+* Rutgers University: Location Mapper, https://github.com/mwe400/LocationMapper
 
 ## Documents
 * 2017-04-23: "[National Symposium on Web Archiving Interoperability: Agenda & Presentation Links](https://docs.google.com/document/d/1PM8u5nxAKUFb4oh1JTDARfl9hat7gOxgU1t2mGvn8Fg/edit#heading=h.n0bnn4za99v2)"
