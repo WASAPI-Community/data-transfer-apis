@@ -16,6 +16,7 @@ This is the public repository for work on the Web Archiving Systems API (WASAPI)
 * 2015-09-15: "[Systems Interoperability and Collaborative Development for Web Archiving](https://www.imls.gov/grants/awarded/lg-71-15-0174-15)"
 
 ## Presentations
+* 2017-12-11: "[Web Archiving Systems APIs (WASAPI)](https://docs.google.com/presentation/d/1lAjeNmnnJb_lLYofqR-ZlqcqxKZ_ithQ57vCPWdPFt4/edit?usp=sharing)
 * 2017-06-15: "[WASAPI:  (Web Archiving Systems APIs) Project Updates and Data Transfer APIs Specifications and Demonstrations](https://docs.google.com/presentation/d/1nbfKd80V613-S7AH9CvbMZVp9SyLWW7ByMwMsBflM5s/edit?usp=sharing)" at [IIPC/ReSAW Web Archiving Week](http://netpreserve.org/wac2017/)
 * 2017-04-27: "[Stanford Web Archiving Work Cycle Inception Deck for Automating Web Archive Crawl Download and Accessioning](https://drive.google.com/file/d/0B7toWei7Sy_SU2VvWWNVUmRRQkk/view?usp=sharing)"
 * 2016-08-03: "[WASAPI: Web Archiving Systems Application Programming Interfaces](https://docs.google.com/presentation/d/1XajUcvETUTL_mSsr0vCno-fzSB15MsRsRmP_pikvGO8/edit?usp=sharing)" at the [SAA Web Archiving Roundtable Meeting](https://archives2016.sched.org/event/6niM/web-archiving) at [Archives Records 2016](http://www2.archivists.org/am2016)
