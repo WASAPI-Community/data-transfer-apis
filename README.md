@@ -11,7 +11,7 @@ This is the public repository for work on the Web Archiving Systems API (WASAPI)
 ## Documents
 * 2017-12-11: "[WASAPI Document Repository in archive.org](https://archive.org/details/wasapi)"
 * 2017-04-23: "[National Symposium on Web Archiving Interoperability: Agenda & Presentation Links](https://docs.google.com/document/d/1PM8u5nxAKUFb4oh1JTDARfl9hat7gOxgU1t2mGvn8Fg/edit#heading=h.n0bnn4za99v2)"
-* 2017-03-02: "[National Symposium on Web Archiving Interoperability Trip Report](https://web.archive.org/web/20180410063821/https://ws-dl.blogspot.fr/2017/03/2017-03-02-national-symposium-on-web.html)
+* 2017-03-02: "[National Symposium on Web Archiving Interoperability Trip Report](https://web.archive.org/web/20180410063821/https://ws-dl.blogspot.fr/2017/03/2017-03-02-national-symposium-on-web.html)"
 * 2017-03-30: "[IMLS Year 1 Interim Performance Report Narrative](https://archive.org/details/WASAPIYearOneReport)"
 * 2016-11-29: "[Archive-It 2016 State of the WARC Report](https://archive-it.org/blog/post/2016-state-of-the-warc-our-second-annual-digital-preservation-survey-results/)"
 * 2016-08-19: "[WASAPI Survey on Data Transfer APIs](https://drive.google.com/file/d/0B7toWei7Sy_SOUJlZFhySHZYTWM/view?usp=sharing)"
