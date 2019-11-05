@@ -43,6 +43,7 @@ The basic parameters for querying for webdata files are:
 - `crawl`: Archive-It crawl job identifier
 - `crawl-time-after` & `crawl-time-before`: date of webdata file creation during a crawl job
 - `crawl-start-after` & `crawl-start-before`: date of crawl job start
+- `store-time-after` & `store-time-before`: date of webdata file storage
 
 ### Query parameters
 
@@ -84,7 +85,7 @@ The `crawl-time-after` and `crawl-time-before` parameters restrict the query to 
 
 To find the files crawled in the first quarter of 2016:
 
-    https://partner.archive-it.org/wasapi/v1/webdata?crawl-time-after=2016-12-31&crawl-time-before=2016-04-01
+    https://partner.archive-it.org/wasapi/v1/webdata?crawl-time-after=2015-12-31&crawl-time-before=2016-04-01
 
 To find all files crawled since 2016:
 
@@ -100,11 +101,27 @@ The `crawl-start-after` and `crawl-start-before` parameters restrict the query t
 
 To find the files from a Q1 2016 crawl:
 
-      https://partner.archive-it.org/wasapi/v1/webdata?crawl-start-after=2016-12-31&crawl-start-before=2016-04-01
+      https://partner.archive-it.org/wasapi/v1/webdata?crawl-start-after=2015-12-31&crawl-start-before=2016-04-01
 
 To find all files from crawls started since 2016:
 
     https://partner.archive-it.org/wasapi/v1/webdata?crawl-start-after=2016-01-01
+
+#### `store-time-after` and `store-time-before` query parameters
+
+The `store-time-after` and `store-time-before` parameters restrict the query to those web archive files deposited into storage within the given time range; see [time formats](#time-formats) for the syntax.  Specify the lower bound (if any) with `store-time-after` and the upper bound (if any) `store-time-before`.
+
+To find the files stored during Q1 2018:
+
+      https://partner.archive-it.org/wasapi/v1/webdata?store-time-after=2017-12-31&store-time-before=2018-04-01
+
+To find all files stored since 2018:
+
+    https://partner.archive-it.org/wasapi/v1/webdata?store-time-after=2018-01-01
+
+To find all files crawled prior to 2017:
+
+    https://partner.archive-it.org/wasapi/v1/webdata?crawl-time-before=2017-01-01
 
 #### Pagination parameters
 
@@ -145,6 +162,9 @@ The `files` field is a list of a subset (check the [pagination fields](#fields-f
 
 - `size`:  the size in bytes of the webdata file
 
+- `store-time`:  an RFC3339 date stamp of the time the webdata file was
+  [stored](#store-time-after-and-store-time-before-query-parameters)
+
 For example:
 
     {
@@ -163,6 +183,7 @@ For example:
           "crawl": 304244,
           "crawl-start": "2017-05-31T22:15:34Z",
           "crawl-time": "2017-05-31T22:15:40Z",
+          "store-time": "2017-06-01T09:36:05Z",
           "filename": "ARCHIVEIT-8232-WEEKLY-JOB304244-20170531221540622-00000.warc.gz",
           "filetype": "warc",
           "locations": [
@@ -180,6 +201,7 @@ For example:
           "crawl": 303042,
           "crawl-start": "2017-05-24T22:15:36Z",
           "crawl-time": "2017-05-26T17:51:37Z",
+          "store-time": "2017-05-27T22:25:12Z",
           "filename": "ARCHIVEIT-8232-WEEKLY-JOB303042-20170526175137981-00002.warc.gz",
           "filetype": "warc",
           "locations": [
