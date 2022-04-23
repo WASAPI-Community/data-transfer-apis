@@ -84,7 +84,7 @@ The `crawl-time-after` and `crawl-time-before` parameters restrict the query to 
 
 To find the files crawled in the first quarter of 2016:
 
-    https://partner.archive-it.org/wasapi/v1/webdata?crawl-time-after=2016-12-31&crawl-time-before=2016-04-01
+    https://partner.archive-it.org/wasapi/v1/webdata?crawl-time-after=2016-01-01&crawl-time-before=2016-04-01
 
 To find all files crawled since 2016:
 
